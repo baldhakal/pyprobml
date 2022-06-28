@@ -44,7 +44,7 @@ for i, beta in enumerate(betas):
     plt.plot(x, ema_debiased(y, beta), c='orange', label='EMA with bias correction')
     plt.title('beta = {:0.2f}'.format(beta))
     plt.legend()
-    name = 'EMA{}.pdf'.format(i)
+    name = f'EMA{i}.pdf'
     save_fig(name)
     plt.show()
   

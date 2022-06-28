@@ -72,7 +72,7 @@ def groupLasso_demo(signal_type, fig_start):
   plt.figure(0+fig_start)
   plt.plot(W_actual)
   plt.title("Original (D = 4096, number groups = 64, active groups = 8)")
-  plt.savefig("W_actual_{}.png".format(signal_type) , dpi=300)
+  plt.savefig(f"W_actual_{signal_type}.png", dpi=300)
   ##### Applying Lasso Regression #####
   # L1 norm is the sum of absolute values of coefficients
   lasso_reg = linear_model.Lasso(alpha=0.5)
@@ -88,7 +88,7 @@ def groupLasso_demo(signal_type, fig_start):
   plt.figure(1+fig_start)
   plt.plot(W_lasso_reg_debiased_2)
   plt.title('Standard L1 (debiased 1, regularization param(L1 = 0.5), MSE = {:.4f})'.format(lasso_reg_mse))
-  plt.savefig("W_lasso_reg_{}.png".format(signal_type), dpi=300)
+  plt.savefig(f"W_lasso_reg_{signal_type}.png", dpi=300)
   ##### Applying Group Lasso L2 regression #####
   # L2 norm is the square root of sum of squares of coefficients 
   # PNLL(W) = NLL(W) + regularization_parameter * Σ(groups)L2-norm
@@ -115,7 +115,7 @@ def groupLasso_demo(signal_type, fig_start):
   plt.figure(2+fig_start)
   plt.plot(W_group_lassoL2_reg_debiased_2)
   plt.title('Block-L2 (debiased 1, regularization param(L2 = 3, L1=1), MSE = {:.4f})'.format(groupLassoL2_mse))
-  plt.savefig("W_groupLassoL2_reg_{}.png".format(signal_type), dpi=300)
+  plt.savefig(f"W_groupLassoL2_reg_{signal_type}.png", dpi=300)
   ##### Applying Group Lasso Linf regression #####
   # To use spams library, it is necessary to convert data to fortran normalized arrays
   # visit http://spams-devel.gforge.inria.fr/ for the documentation of spams library
@@ -127,11 +127,19 @@ def groupLasso_demo(signal_type, fig_start):
   Y_normalized = spams.normalize(Y_normalized)
   groups_modified = np.concatenate([[i] for i in groups]).reshape(-1, 1)
   W_initial = np.zeros((X_normalized.shape[1],Y_normalized.shape[1]),dtype=float,order="F")
-  param = {'numThreads' : -1,'verbose' : True,
-  'lambda2' : 3, 'lambda1' : 1, 'max_it' : 500,
-  'L0' : 0.1, 'tol' : 1e-2, 'intercept' : False,
-  'pos' : False, 'loss' : 'square'}
-  param['regul'] = "group-lasso-linf"
+  param = {
+      'numThreads': -1,
+      'verbose': True,
+      'lambda2': 3,
+      'lambda1': 1,
+      'max_it': 500,
+      'L0': 0.1,
+      'tol': 0.01,
+      'intercept': False,
+      'pos': False,
+      'loss': 'square',
+      'regul': "group-lasso-linf",
+  }
   param2=param.copy()
   param['size_group'] = 64
   param2['groups'] = groups_modified
@@ -147,7 +155,7 @@ def groupLasso_demo(signal_type, fig_start):
   axes = plt.gca()
   plt.plot(W_group_lassoLinf_reg_debiased_2)
   plt.title('Block-Linf (debiased 1, regularization param(L2 = 3, L1=1), MSE = {:.4f})'.format(groupLassoLinf_mse))
-  plt.savefig("W_groupLassoLinf_reg_{}.png".format(signal_type), dpi=300)
+  plt.savefig(f"W_groupLassoLinf_reg_{signal_type}.png", dpi=300)
   plt.show()
 
 def main():

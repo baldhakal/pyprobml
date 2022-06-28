@@ -116,8 +116,7 @@ class LinearBandit:
         # Could also use epsilon greedy or UCB
         sigma2_samp, w_samp = self.sample_params(key, bel)
         predicted_reward = jnp.einsum("m,km->k", context, w_samp)
-        action =  predicted_reward.argmax()
-        return action
+        return predicted_reward.argmax()
     
 
 class MLP(nn.Module):
@@ -139,8 +138,7 @@ def fit_model(key, model, X, y, variables):
 
     def loglik(params, x, y):
         pred_y = model.apply(variables, x)
-        loss = jnp.square(y - pred_y)
-        return loss
+        return jnp.square(y - pred_y)
 
     def logprior(params):
         # Spherical Gaussian prior
@@ -167,8 +165,7 @@ def NeuralGreedy():
     def encode(self, context, action):
         action_onehot = jax.nn.one_hot(action, self.num_arms)
         ndims = self.num_features + self.num_arms
-        x = np.concatenate([context, action_onehot]);
-        return x
+        return np.concatenate([context, action_onehot])
 
     def init_bel(self, key, contexts, actions, rewards):
         ndims = self.num_features + self.num_arms
@@ -177,15 +174,13 @@ def NeuralGreedy():
         y = rewards
         variables = self.model.init(key, X)
         variables = fit_model(key, self.model, X, y, variables)
-        bel = (X, y, variables)
-        return bel       
+        return X, y, variables       
 
     def update_bel(self, key, bel, context, action, reward): 
         (X, y, variables) = bel
-        if self.memory is not None: # finite memory
-            if len(y)==self.memory: # memory is full
-                X.pop(0)
-                y.pop(0)
+        if self.memory is not None and len(y) == self.memory:
+            X.pop(0)
+            y.pop(0)
         x = self.encode(context, action)
         X.append(x)
         y.append(reward)
@@ -201,7 +196,7 @@ def NeuralGreedy():
             # random action
             actions = jnp.arange(self.num_arms)
             key, mykey = split(key)
-            action = jax.random.choice(mykey, actions)
+            return jax.random.choice(mykey, actions)
         else:
             # greedy action
             predicted_rewards = jnp.zeros((self.num_arms,))
@@ -210,8 +205,7 @@ def NeuralGreedy():
             for a in range(self.num_arms):
                 x = self.encode(context, a)
                 predicted_rewards[a] = self.model.apply(variables, x)
-            action =  predicted_rewards.argmax()
-        return action
+            return predicted_rewards.argmax()
         
         
     

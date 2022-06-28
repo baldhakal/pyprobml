@@ -24,7 +24,7 @@ df_iris = pd.DataFrame(data=iris.data,
                         columns=['sepal_length', 'sepal_width', 
                                  'petal_length', 'petal_width'])
 df_iris['species'] = pd.Series(iris.target_names[y], dtype='category')
-    
+
 df = df_iris.query("species == ('setosa', 'versicolor')")
 y_0 = pd.Categorical(df['species']).codes
 x_n = 'sepal_length' 

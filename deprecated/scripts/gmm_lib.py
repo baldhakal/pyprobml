@@ -16,15 +16,15 @@ def plot_mixtures(X, mu, pi, Sigma, r, step=0.01, cmap="viridis", ax=None):
     x1, y1 = X.max(axis=0)
     xx, yy = np.mgrid[x0:x1:step, y0:y1:step]
     zdom = np.c_[xx.ravel(), yy.ravel()]
-    
+
     Norms = [multivariate_normal(mean=mui, cov=Sigmai)
              for mui, Sigmai in zip(mu, Sigma)]
-    
+
     for Norm, color in zip(Norms, colors):
         density = Norm.pdf(zdom).reshape(xx.shape)
         ax.contour(xx, yy, density, levels=1,
                     colors=color, linewidths=5)
-        
+
     ax.scatter(*X.T, alpha=0.7, c=r, cmap=cmap, s=10)
     ax.set_xlim(x0, x1)
     ax.set_ylim(y0, y1)
@@ -58,14 +58,10 @@ def m_step(X, responsibilities, S=None, eta=None):
         dk = (X - mu_k)
         Sigma_k = resp_k[:, np.newaxis, np.newaxis] * np.einsum("ij, ik->ikj", dk, dk)
         Sigma_k = Sigma_k.sum(axis=0)
-        if not has_priors:
-            Sigma_k = Sigma_k / Nk
-        else: 
-            Sigma_k = (S + Sigma_k) / (eta + Nk + M + 2)
-
+        Sigma_k = (S + Sigma_k) / (eta + Nk + M + 2) if has_priors else Sigma_k / Nk
         # pi_k
         pi_k = Nk / N
-        
+
         pi.append(pi_k)
         mu.append(mu_k)
         Sigma.append(Sigma_k)

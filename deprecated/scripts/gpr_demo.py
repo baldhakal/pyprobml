@@ -147,7 +147,7 @@ for i, (l, sigma_f, sigma_y) in enumerate(params):
     plot_gp(mu_s, cov_s, X, X_train=X_train, Y_train=Y_train)
 pml.save_fig('gp-hparams.pdf')
 plt.show()
-  
+
 
 
 
@@ -211,8 +211,16 @@ Y_2D_train = np.sin(0.5 * np.linalg.norm(X_2D_train, axis=1)) + \
 
 plt.figure(figsize=(14,7))
 mu_s, _ = posterior_predictive(X_2D, X_2D_train, Y_2D_train, sigma_y=noise_2D)
-plot_gp_2D(gx, gy, mu_s, X_2D_train, Y_2D_train, 
-           f'Before parameter optimization: l={1.00} sigma_f={1.00}', 1)
+plot_gp_2D(
+    gx,
+    gy,
+    mu_s,
+    X_2D_train,
+    Y_2D_train,
+    'Before parameter optimization: l=1.0 sigma_f=1.0',
+    1,
+)
+
 pml.save_fig('gp-2d-unfitted.pdf')
 plt.show()
 

@@ -23,18 +23,14 @@ def scan_file(fid):
         for word in line.strip().split():
             if word == last_word:
                 dups.append(word)
-            if re.match(r'.*[a-zA-Z]', word):
-                last_word = word
-            else:
-                last_word = None
+            last_word = word if re.match(r'.*[a-zA-Z]', word) else None
     return dups
 
 if len(sys.argv) > 1:
     for filename in sys.argv[1:]:
         with open(filename, 'r') as fid:
-            dups = scan_file(fid)
-            if dups:
-                print('Duplicate words seen in ' + filename)
+            if dups := scan_file(fid):
+                print(f'Duplicate words seen in {filename}')
                 print('\n'.join(dups))
                 print('')
 else:

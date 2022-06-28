@@ -17,7 +17,7 @@ Q = np.zeros((n, n))
 
 for d in range(D):
     Q = Q + (np.tile(x[:, d].reshape((n, 1)), (1, n)) - np.tile(x[:, d].T, (n, 1)))**2
-    
+
 Q = np.exp(-0.5*Q)
 
 np.random.seed(37)
@@ -59,7 +59,7 @@ Q = np.zeros((n, n))
 L = [1, 5]
 for d in range(D):
     Q = Q + (np.tile(x[:, d].reshape((n, 1)), (1, n)) - np.tile(x[:, d].T, (n, 1)))**2/L[d]**2
-    
+
 Q = np.exp(-0.5*Q)
 
 

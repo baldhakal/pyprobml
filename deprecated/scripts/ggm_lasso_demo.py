@@ -33,9 +33,10 @@ for lam in lambdas:
     theta = cp.Variable(shape=(p, p), PSD=True)
     # An alternative formulation of the problem () can be posed,
     # where we don't penalize the diagonal of theta.
-    l1_penalty = sum([cp.abs(theta[i, j])
-                      for i in range(p)
-                      for j in range(p) if i != j])
+    l1_penalty = sum(
+        cp.abs(theta[i, j]) for i in range(p) for j in range(p) if i != j
+    )
+
     objective = cp.Maximize(
         cp.log_det(theta) - cp.trace(theta@S) - lam*l1_penalty)
     problem = cp.Problem(objective)

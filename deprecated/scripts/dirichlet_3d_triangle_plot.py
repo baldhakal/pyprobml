@@ -44,11 +44,9 @@ for i in range(3):
     ax.add_artist(art)
     theta = '$\theta_' + str(i) + '$'
     EndPs = [[0,0],[0,0],[0,0]]
+    EndPs[i][1] = 1
     if i == 0:
-        EndPs[i][1] = 1
         EndPs[2][1] = -.2
-    else:
-        EndPs[i][1] = 1
     ax.text(EndPs[0][1], EndPs[1][1], EndPs[2][1], r'$\theta_%s$' % (i + 1),size=20)
 
 ax.view_init(elev=30, azim=20)

@@ -122,6 +122,6 @@ assert np.isclose(betaM, betaM_rethinking, atol=1e-1)
 print("sigma_y: ",[sigma_y, sigma_y_rethinking])
 assert np.isclose(sigma_y, sigma_y_rethinking, atol=1e-1)
 for i in range(2):
-  for j in range(2):
-    print("rho[{},{}]: ".format(i,j),[rho[i][j], rho_rethinking[i][j]])
-    assert np.isclose(rho[i][j], rho_rethinking[i][j], atol=1e-1)
+    for j in range(2):
+        print(f"rho[{i},{j}]: ", [rho[i][j], rho_rethinking[i][j]])
+        assert np.isclose(rho[i][j], rho_rethinking[i][j], atol=1e-1)

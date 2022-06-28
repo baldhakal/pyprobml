@@ -101,8 +101,7 @@ class ClassConditionalBMM(jittable.Jittable):
         bern_loglikelihood_0 = (1 - X) @ jnp.clip(
             jnp.log(1 - jnp.clip(self._model.components_distribution.distribution.probs[c],
                                  a_min=self.threshold, a_max=1.0)), a_min=self.log_threshold, a_max=0).T
-        mix_loglikelihood = mixing_loglikelihood + bern_loglikelihood_1 + bern_loglikelihood_0
-        return mix_loglikelihood
+        return mixing_loglikelihood + bern_loglikelihood_1 + bern_loglikelihood_0
 
     @jit
     def logsumexp(self, matrix, keepdims=True):
@@ -125,8 +124,7 @@ class ClassConditionalBMM(jittable.Jittable):
 
         bern_sum = jnp.sum(jnp.exp(matrix - M), axis=1, keepdims=keepdims)
         bern_sum = jnp.where(bern_sum < self.threshold, self.threshold, bern_sum)
-        log_bern_sum = M + jnp.log(bern_sum)
-        return log_bern_sum
+        return M + jnp.log(bern_sum)
 
     def _sample_minibatches(self, iterables, batch_size):
         '''

@@ -44,8 +44,7 @@ def dirichlet_moment_match(data):
 def polya_moment_match(data):
   sdata = np.expand_dims(np.sum(X, axis=1) ,axis=1)
   p = data / sdata
-  a = dirichlet_moment_match(p)
-  return a 
+  return dirichlet_moment_match(p) 
 
 def polya_fit_simple(data):
   a = polya_moment_match(data)

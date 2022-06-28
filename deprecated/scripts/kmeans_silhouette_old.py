@@ -21,34 +21,21 @@ from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-if 0:
-    blob_centers = np.array(
-        [[ 0.2,  2.3],
-         [-1.5 ,  2.3],
-         [-2.8,  1.8],
-         [-2.8,  2.8],
-         [-2.8,  1.3]])
-    blob_std = np.array([0.4, 0.3, 0.1, 0.1, 0.1])
-    X, y = make_blobs(n_samples=2000, centers=blob_centers,
-                      cluster_std=blob_std, random_state=7)
-    geron_data = True
+# two off-diagonal blobs
+X1, _ = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
+X1 = X1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
+# three spherical blobs
+blob_centers = np.array(
+    [[ -4,  1],
+     [-4 ,  3],
+     [-4,  -2]])
+s = 0.5
+blob_std = np.array([s, s, s])
+X2, _ = make_blobs(n_samples=1000, centers=blob_centers,
+                  cluster_std=blob_std, random_state=7)
 
-if 1:
-    # two off-diagonal blobs
-    X1, _ = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
-    X1 = X1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
-    # three spherical blobs
-    blob_centers = np.array(
-        [[ -4,  1],
-         [-4 ,  3],
-         [-4,  -2]])
-    s = 0.5
-    blob_std = np.array([s, s, s])
-    X2, _ = make_blobs(n_samples=1000, centers=blob_centers,
-                      cluster_std=blob_std, random_state=7)
-    
-    X = np.r_[X1, X2]
-    geron_data= False
+X = np.r_[X1, X2]
+geron_data= False
 
 
 
@@ -100,7 +87,7 @@ plt.figure(figsize=(11, 9))
 
 for k in (3, 4, 5, 6):
     plt.subplot(2, 2, k - 2)
-    
+
     y_pred = kmeans_per_k[k - 1].labels_
     silhouette_coefficients = silhouette_samples(X, y_pred)
 
@@ -117,7 +104,7 @@ for k in (3, 4, 5, 6):
         #color = colors[i]
         plt.fill_betweenx(np.arange(pos, pos + len(coeffs)), 0, coeffs,
                          facecolor=color, edgecolor=color, alpha=0.7)
-        
+
         #cmap = "Pastel2"
         #plt.fill_betweenx(np.arange(pos, pos + len(coeffs)), 0, coeffs,
         #                  cmap=cmap, alpha=0.7)
@@ -128,7 +115,7 @@ for k in (3, 4, 5, 6):
     plt.gca().yaxis.set_major_formatter(FixedFormatter(range(k)))
     if k in (3, 5):
         plt.ylabel("Cluster")
-    
+
     if k in (5, 6):
         plt.gca().set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
         plt.xlabel("Silhouette Coefficient")
@@ -173,12 +160,12 @@ def plot_decision_boundaries(clusterer, X, K, resolution=1000):
     cmap ="Pastel2"
     #cmap = mpl.cm.Spectral(K) 
     plt.contourf(Z, extent=(mins[0], maxs[0], mins[1], maxs[1]),cmap=cmap)
-    
+
     ##cmap = cm.get_cmap("Pastel2")
     #colors = [cmap(i) for i in range(K)]
     #print(colors)
     #plt.contourf(Z, extent=(mins[0], maxs[0], mins[1], maxs[1]),colors=colors)
-    
+
     plt.contour(Z, extent=(mins[0], maxs[0], mins[1], maxs[1]),
                 linewidths=1, colors='k')
     plot_data(X)

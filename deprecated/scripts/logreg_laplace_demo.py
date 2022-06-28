@@ -67,7 +67,7 @@ plt.contour(xx, yy, -1*log_like.reshape((n,n)), 30)
 plt.title("Log-Likelihood")
 
 #Plotting points corresponding to chosen lines
-for ii in range(0, ws.shape[0]):
+for ii in range(ws.shape[0]):
     w = np.transpose(ws[ii, :])
     plt.annotate(str(ii+1), xy=(w[0], w[1]), color=col[ii])
 
@@ -125,7 +125,7 @@ plt.scatter(x_1, y_1, c='red', s=20, marker='o')
 plt.scatter(x_2, y_2, c='blue', s=20, marker='o')
 predm = np.zeros((n*n,1))
 s = 100
-for i in range(s):
+for _ in range(s):
     wsamp = np.random.multivariate_normal(mean = wfit, cov=co)
     pred = 1.0/(1+np.exp(np.dot(-Xgrid,wsamp)))
     predm = np.add(predm, pred.reshape((n*n, 1)))

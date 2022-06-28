@@ -51,8 +51,8 @@ for i in range(len(ns)):
     n = ns[i]
     colour = colours[i]
     linestyle = linestyles[i]
-    label = 'N = {}'.format(n)
-    
+    label = f'N = {n}'
+
     plot_data = data[:n]
     dof, scaling = posterior_parameters(plot_data)
     plot_posterior(dof, scaling, colour, linestyle, label)

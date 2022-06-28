@@ -22,14 +22,14 @@ def fisherDiscrimVowelDemo():
     C = np.max(ytrain)
     muC = np.zeros((C, D))
 
-    for c in range(0, C):
+    for c in range(C):
         muC[c, :] = (np.mean((Xtrain[np.where(ytrain == (c+1))[0], :]), axis=0))
 
     muC2d = pca.transform(muC)
 
     symbols = '+ovd*.xs^d><ph'
 
-    for c in range(0, C):
+    for c in range(C):
         ndx = np.where(ytrain == (c+1))
         plt.scatter(Z[ndx, 0], Z[ndx, 1], marker=symbols[c])
     plt.savefig('../figures/fisherDiscrimVowelPCA')
@@ -45,7 +45,7 @@ def fisherDiscrimVowelDemo():
 
     print(muC.shape)
     muC2dlda = np.dot(muC, W)
-    for c in range(0, C):
+    for c in range(C):
         ndx = np.where(ytrain == c+1)
         plt.scatter(muC2dlda[c, 0], muC2dlda[c, 1],  'o')
 

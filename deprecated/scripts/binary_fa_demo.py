@@ -68,12 +68,12 @@ class BinaryFA:
     xi = (2 * y -1) * (W.T @ mu_prior + b)
     xi[xi==0] = 0.01 * np.random.rand(np.count_nonzero(xi==0)) # 16x1
     sigma_inv, iter = np.linalg.inv(self.sigma_prior), 0
-    for iter in range(max_iter):
+    for _ in range(max_iter):
       lambd = (0.5 - sigmoid(xi)) / (2*xi)
       tmp = W @ np.diagflat(lambd) @ W.T # 2x2
       sigma_post = np.linalg.inv(sigma_inv - (2 * tmp))
       tmp = y -0.5 + 2* lambd * b
-      tmp2 = np.sum(W @ np.diagflat(tmp), axis=1).reshape((2,1)) 
+      tmp2 = np.sum(W @ np.diagflat(tmp), axis=1).reshape((2,1))
       mu_post = sigma_post @ (sigma_inv @ mu_prior + tmp2)
 
       tmp = np.diag(W.T @ (sigma_post + mu_post @ mu_post.T) @ W)
@@ -124,20 +124,16 @@ class BinaryFA:
     return mu_post, sigma_post, loglik
 
 def sigmoid_times_gauss(X, wMAP, C):
-  vv = lambda x, y: jnp.vdot(x, y)  
+  vv = lambda x, y: jnp.vdot(x, y)
   mv = vmap(vv, (None, 0), 0)
-  mm = vmap(mv, (0, None), 0) 
+  mm = vmap(mv, (0, None), 0)
   vm = vmap(vv, (0, 0), 0)
-  
+
   mu = X @ wMAP;
   n = X.shape[1]
-  if n < 1000:
-    sigma2 = np.diag(X @ C @ X.T)
-  else:
-    sigma2 = vm(X , mm(C,X))
+  sigma2 = np.diag(X @ C @ X.T) if n < 1000 else vm(X , mm(C,X))
   kappa = 1 / np.sqrt(1 + np.pi * sigma2 /8);
-  p = sigmoid(kappa * mu.reshape(kappa.shape))
-  return p
+  return sigmoid(kappa * mu.reshape(kappa.shape))
 
 np.random.seed(1)
 
@@ -145,15 +141,15 @@ max_iter, conv_tol = 50, 1e-4
 sigmoid = lambda x : 1/(1 + np.exp(-1 * x))
 d, k, m = 16, 3, 50
 noise_level = 0.5
- 
+
 proto = np.random.rand(d, k) < noise_level
 src = np.concatenate((np.tile(proto[:,0], (1,m)), np.tile(proto[:,1],(1,m)), np.tile(proto[:,2],(1,m))),axis=1)
 clean_data = np.concatenate((np.tile(proto[:,0], (m,1)), np.tile(proto[:,1],(m,1)), np.tile(proto[:,2],(m,1))), axis=0)
 n = clean_data.shape[0]
- 
- 
+
+
 mask, noisy_data, missing_data, = np.random.rand(n,d) < 0.05, np.copy(clean_data), np.copy(clean_data)
- 
+
 noisy_data[mask] = 1 - noisy_data[mask]
 missing_data[mask] = np.nan
 
@@ -166,7 +162,7 @@ plt.show()
 
 binaryFA = BinaryFA(d, 2, 50, 1e-4, True)
 binaryFA.variational_em(noisy_data)
- 
+
 mu_post, sigma_post, loglik  = binaryFA.infer_latent(noisy_data)
 
 symbols = ['ro', 'gs', 'k*']
@@ -176,7 +172,7 @@ plt.plot(mu_post[0,m:2*m], mu_post[1,m:2*m], symbols[1])
 plt.plot(mu_post[0,2*m:], mu_post[1,2*m:], symbols[2])
 plt.title('Latent Embedding')
 plt.show()
- 
+
 prob_on = binaryFA.predict_missing(noisy_data)
 plt.figure()
 plt.imshow(prob_on, aspect='auto', interpolation='none',

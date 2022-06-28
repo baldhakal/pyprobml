@@ -17,8 +17,7 @@ class GMM:
 
     def _step_hmm(self, key, s_prev):
         p_transition = self.transition_matrix[s_prev, :]
-        s_next = jax.random.choice(key, self.n_states, p=p_transition)
-        return s_next
+        return jax.random.choice(key, self.n_states, p=p_transition)
 
     def _step_process(self, s_prev, key):
         key_obs, key_step = jax.random.split(key)

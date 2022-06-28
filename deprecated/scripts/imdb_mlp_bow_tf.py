@@ -49,9 +49,9 @@ def decode_review(text):
     return ' '.join([reverse_word_index.get(i, '?') for i in text])
 
 for i in range(2):
-  print('example {}, label {}'.format(i, train_labels[i]))
-  print(decode_review(train_data[i]))
-  
+    print(f'example {i}, label {train_labels[i]}')
+    print(decode_review(train_data[i]))
+
 
 """
 example 0, label 1

@@ -19,7 +19,7 @@ marginal_lik = np.zeros(2**N)
 log_lik = np.zeros(2**N)
 log_BF = np.zeros(2**N)
 
-for i in range(0,2**N):
+for i in range(2**N):
     flips[i] = np.array(np.unravel_index(i, [2]*N, 'F')) + 1
     Nh[i] = len(np.where(flips[i] == 1)[0])
     Nt[i] = len(np.where(flips[i] == 2)[0])

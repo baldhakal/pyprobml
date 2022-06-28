@@ -38,11 +38,10 @@ def softmax_cross_entropy(logprobs, labels):
 def compute_metrics(logprobs, labels):
   loss = softmax_cross_entropy(logprobs, labels)
   accuracy = jnp.mean(jnp.argmax(logprobs, -1) == labels)
-  metrics = {
+  return {
       'loss': loss,
       'accuracy': accuracy,
   }
-  return metrics
 
 
 @partial(jit, static_argnums=(0,))
@@ -106,14 +105,14 @@ def fit_model(
        print('train step: {:d}, loss: {:0.4f}, accuracy: {:0.2f}'.format(
               step, train_metrics['loss'], 
                  train_metrics['accuracy']))
-       
+
     if (test_every > 0) & (step % test_every == 0):
       batch = next(test_iter)
       if preprocess_test_batch is not None:
         batch = preprocess_test_batch(batch, rng)
       test_metrics = test_fn(model, optimizer.target, batch)
       history  = append_history(history, train_metrics, test_metrics)
-      
+
   params = optimizer.target
   return params, history
 
@@ -137,7 +136,7 @@ def make_iterator_from_batch(batch):
 
 def l2norm_sq(x):
   leaves, _ = tree_util.tree_flatten(x)
-  return sum([np.sum(leaf ** 2) for leaf in leaves])
+  return sum(np.sum(leaf ** 2) for leaf in leaves)
 
 def test():
   # We just check we can run the functions and that they return "something"

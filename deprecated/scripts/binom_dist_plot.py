@@ -25,6 +25,6 @@ for th in thetas:
     plt.xticks(X)
     plt.title(title)
     plt.draw()
-    pml.savefig('binomDistTheta' + str(int(th*100)) + '.pdf')
+    pml.savefig(f'binomDistTheta{int(th*100)}.pdf')
 
 plt.show()

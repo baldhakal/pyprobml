@@ -34,7 +34,7 @@ for i in range(1, cols * rows + 1):
     #sample_idx = torch.randint(len(training_data), size=(1,)).item()
     sample_idx = i
     img, label = training_data[sample_idx]
-    figure.add_subplot(rows, cols, i)
+    figure.add_subplot(rows, cols, sample_idx)
     label = training_data.classes[label]
     plt.title(label, fontsize=18)
     #plt.axis("off")

@@ -48,7 +48,8 @@ def update():
         a.sub_(lr * a.grad)
         a.grad.zero_()
 
-for t in range(100): update()
+for _ in range(100):
+    update()
 
 plt.scatter(x[:,0],y)
 plt.scatter(x[:,0],x@a.detach())

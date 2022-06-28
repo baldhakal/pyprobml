@@ -36,7 +36,7 @@ pipeline = Pipeline([
 ])
 pipeline.fit(X_train, y_train)
 score_kmeans = pipeline.score(X_test, y_test)
-              
+
 print(score_kmeans)
 
 
@@ -81,7 +81,7 @@ print(score_manual)
 y_train_propagated = np.empty(len(X_train), dtype=np.int32)
 for i in range(k):
     y_train_propagated[kmeans.labels_==i] = y_representative_digits[i]
-    
+
 # Propaget label to all points in top 20% of prxomity to  cluster center
 percentile_closest = 100
 X_cluster_dist = X_digits_dist[np.arange(len(X_train)), kmeans.labels_]

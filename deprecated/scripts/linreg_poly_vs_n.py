@@ -52,7 +52,7 @@ for ModDeg in degrees:
         ypred = regr.predict(XDesignTest)
         err.append(np.mean((ytest-ypred)**2))
         errtrain.append(np.mean((ytrain-regr.predict(XDesignTrain))**2))
-    
+
     #Plotting
     fig, ax = plt.subplots()
     ax.plot(ns, err, color = 'r', marker = 's',label='test')
@@ -63,8 +63,8 @@ for ModDeg in degrees:
     plt.axhline(y=4, color='k', linewidth=2)
     plt.xlabel('size of training set')
     plt.ylabel('mse')
-    plt.title('truth = degree {}, model = degree {}'.format(TrueDeg, ModDeg))
-    pml.savefig('polyfitN{}.pdf'.format(ModDeg))
+    plt.title(f'truth = degree {TrueDeg}, model = degree {ModDeg}')
+    pml.savefig(f'polyfitN{ModDeg}.pdf')
     plt.show()
 
 plt.show()

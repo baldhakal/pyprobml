@@ -11,7 +11,7 @@ user, repo = args.user_name.split("/")
 FOLDERS = ["workflow_testing_indicator", "auto_generated_figures"]
 for folder in FOLDERS:
     if os.path.exists(folder):
-        os.system("rm -rf " + folder)
+        os.system(f"rm -rf {folder}")
     os.makedirs(folder)
 
 try:

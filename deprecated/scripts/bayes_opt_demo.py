@@ -117,24 +117,26 @@ X_sample = X_init
 Y_sample = Y_init
 
 def callback(X_next, Y_next, i):
-  global X_sample, Y_sample
-  # Plot samples, surrogate function, noise-free objective and next sampling location
-  #plt.subplot(n_iter, 2, 2 * i + 1)
-  plt.figure()
-  plot_approximation(gpr, X, Y, X_sample, Y_sample, X_next, show_legend=i==0)
-  plt.title(f'Iteration {i+1}')
-  if save_figures: pml.savefig('bayes-opt-surrogate-{}.pdf'.format(i+1))
-  plt.show()
-  
-  plt.figure()
-  #plt.subplot(n_iter, 2, 2 * i + 2)
-  plot_acquisition(X, expected_improvement(X, X_sample, Y_sample, gpr), X_next, show_legend=i==0)
-  if save_figures: pml.savefig('bayes-opt-acquisition-{}.pdf'.format(i+1))
-  plt.show()
-  
-  # Add sample to previous samples
-  X_sample = np.append(X_sample, np.atleast_2d(X_next), axis=0)
-  Y_sample = np.append(Y_sample, np.atleast_2d(Y_next), axis=0)
+    global X_sample, Y_sample
+    # Plot samples, surrogate function, noise-free objective and next sampling location
+    #plt.subplot(n_iter, 2, 2 * i + 1)
+    plt.figure()
+    plot_approximation(gpr, X, Y, X_sample, Y_sample, X_next, show_legend=i==0)
+    plt.title(f'Iteration {i+1}')
+    if save_figures:
+        pml.savefig(f'bayes-opt-surrogate-{i + 1}.pdf')
+    plt.show()
+
+    plt.figure()
+    #plt.subplot(n_iter, 2, 2 * i + 2)
+    plot_acquisition(X, expected_improvement(X, X_sample, Y_sample, gpr), X_next, show_legend=i==0)
+    if save_figures:
+        pml.savefig(f'bayes-opt-acquisition-{i + 1}.pdf')
+    plt.show()
+
+    # Add sample to previous samples
+    X_sample = np.append(X_sample, np.atleast_2d(X_next), axis=0)
+    Y_sample = np.append(Y_sample, np.atleast_2d(Y_next), axis=0)
     
   
 def callback_noplot(X_next, Y_next, i):
@@ -154,11 +156,11 @@ solver = BayesianOptimizer(X_init, Y_init, gpr, acq_fn, acq_solver, n_iter=n_ite
 
 solver.maximize(f)
 
- 
+
 plot_convergence(X_sample, Y_sample)
 if save_figures: pml.savefig('bayes-opt-convergence.pdf')
 plt.show()
-  
+
 ####################
  # skopt, https://scikit-optimize.github.io/
 """

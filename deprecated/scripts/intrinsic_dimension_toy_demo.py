@@ -80,12 +80,11 @@ def optimize_subspace(key, d, D):
     key_weight, key_map, key_sign = random.split(key, 3)
     theta_0 = random.normal(key_weight, (D,)) / 10
     theta_sub_0 = jnp.zeros(d)
-    
+
     choice_map = random.bernoulli(key_map, 1 / jnp.sqrt(D), shape=(D, d))
     P = random.choice(key_sign, jnp.array([-1, 1]), shape=(D, d)) * choice_map
     f_part = partial(subspace_loss, P=P, theta_0=theta_0, y=y)
-    res = minimize(f_part, theta_sub_0, method="bfgs", tol=1e-3)
-    return res
+    return minimize(f_part, theta_sub_0, method="bfgs", tol=1e-3)
 
 if __name__ == "__main__":
     plt.rcParams["axes.spines.top"] = False
@@ -119,7 +118,7 @@ if __name__ == "__main__":
         ans["dim"].append(dim)
         ans["loss"].append(res.fun)
         ans["w"].append(res.x)
-    
+
     # 3. Plot performance of the subspace function
     #   as a function of the dimension
     performance = jnp.exp(-jnp.array(ans["loss"])) / jnp.exp(-optimal_loss)

@@ -48,7 +48,7 @@ def plot_projection_data(X, y, mu, nclasses, figure_num):
     colors = [lightblue, blue, brown, magenta, orange, cyan, gray, yellow, black, red, green2]
 
     plt.figure(figure_num)
-    for c in range(0, nclasses):
+    for c in range(nclasses):
         colors[c] = [col / 255 for col in colors[c]]
         ndx = np.where(y == (c + 1))
         plt.scatter(X[ndx, 0], X[ndx, 1], marker=symbols[c], s=30, facecolor="none", edgecolor=colors[c])
@@ -68,7 +68,7 @@ pca = PCA(K)
 X_pca = pca.fit_transform(X)
 X_pca = -X_pca  # make it look like the Hastie figure
 muC = np.zeros((nclasses, ndims))
-for c in range(0, nclasses):
+for c in range(nclasses):
     muC[c, :] = (np.mean((X[np.where(y == (c + 1))[0], :]), axis=0))
 
 muC2d_pca = pca.fit_transform(muC)

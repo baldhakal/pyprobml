@@ -50,27 +50,26 @@ class GPClassificationModel(AbstractVariationalGP):
     def forward(self, x):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
-        latent_pred = gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
-        return latent_pred
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
 def train(model, init_lengthscale, init_sigmaf_2):
-  model.covar_module.base_kernel.lengthscale = init_lengthscale
-  model.covar_module.outputscale = init_sigmaf_2
-  likelihood = gpytorch.likelihoods.BernoulliLikelihood()
-  # Training:
-  model.train()
-  likelihood.train()
-  optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
-  mll = VariationalELBO(likelihood, model, train_y.numel())
-  training_iter = 200
-  for i in range(training_iter):
-      optimizer.zero_grad()
-      model = model.double()
-      output = model(train_x.double()) 
-      train_y2 = train_y.view(120)
-      loss = -mll(output, train_y2)
-      loss.backward()
-      optimizer.step()
+    model.covar_module.base_kernel.lengthscale = init_lengthscale
+    model.covar_module.outputscale = init_sigmaf_2
+    likelihood = gpytorch.likelihoods.BernoulliLikelihood()
+    # Training:
+    model.train()
+    likelihood.train()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+    mll = VariationalELBO(likelihood, model, train_y.numel())
+    training_iter = 200
+    for _ in range(training_iter):
+        optimizer.zero_grad()
+        model = model.double()
+        output = model(train_x.double())
+        train_y2 = train_y.view(120)
+        loss = -mll(output, train_y2)
+        loss.backward()
+        optimizer.step()
 
 def plot(model, likelihood):  
     model.eval()

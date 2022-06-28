@@ -158,22 +158,23 @@ def make_model(name, seed=0):
 ###############
 
 # Define each expermental configuration
-expts = []
 ep = 4
 #model = 'Logreg'
 model = 'MLP'
 #model = 'CNN'
 bs = 10
-expts.append({'lr':'armijo', 'bs':bs, 'epochs':ep, 'model': model})
-expts.append({'lr':0.01, 'bs':bs, 'epochs':ep, 'model': model})
-expts.append({'lr':0.1, 'bs':bs, 'epochs':ep, 'model': model})
+expts = [
+    {'lr': 'armijo', 'bs': bs, 'epochs': ep, 'model': model},
+    {'lr': 0.01, 'bs': bs, 'epochs': ep, 'model': model},
+    {'lr': 0.1, 'bs': bs, 'epochs': ep, 'model': model},
+]
 #expts.append({'lr':0.5, 'bs':bs, 'epochs':ep, 'model': model})
 
 @torch.no_grad()
 def eval_loss(model, loader):    
     avg_loss = 0.0
     model.eval()
-    for step, (x_batch, y_batch) in enumerate(loader):
+    for x_batch, y_batch in loader:
         # Copy data to GPU if needed
         x_batch = x_batch.to(device)
         y_batch = y_batch.to(device)
@@ -183,7 +184,7 @@ def eval_loss(model, loader):
     # Compute average loss per example
     # Note that the criterion already averages within each batch.
     n_batches = len(loader)
-    avg_loss /= n_batches 
+    avg_loss /= n_batches
     return avg_loss       
     
 def fit_epoch(model, optimizer, train_loader, loss_history):    
@@ -212,7 +213,7 @@ def fit_epoch(model, optimizer, train_loader, loss_history):
 
 def fit_epoch_armijo(model, optimizer, train_loader, loss_history, step_size_history):    
     epoch_loss = 0.0
-    for step, (x_batch, y_batch) in enumerate(train_loader):
+    for x_batch, y_batch in train_loader:
         x_batch = x_batch.to(device)
         y_batch = y_batch.to(device)
         batch_loss, step_size = model.step((x_batch, y_batch))
@@ -240,17 +241,17 @@ for expt in expts:
     step_size_history = []
     print_every = max(1, int(0.1*max_epochs))
     if lr == 'armijo':
-        name = '{}-armijo-bs{}'.format(model_name, bs)
+        name = f'{model_name}-armijo-bs{bs}'
         model = ArmijoModel(model, criterion)
-        optimizer = SGD_Armijo(model, batch_size=bs, dataset_size=N_train)  
+        optimizer = SGD_Armijo(model, batch_size=bs, dataset_size=N_train)
         model.opt = optimizer
         armijo = True
     else:
         name = '{}-lr{:0.3f}-bs{}'.format(model_name, lr, bs)
         optimizer = torch.optim.SGD(model.parameters(), lr=lr)
         armijo = False
-    
-    print('starting {}'.format(name))
+
+    print(f'starting {name}')
     for epoch in range(max_epochs):
         if armijo:
            avg_batch_loss = fit_epoch_armijo(model, optimizer, train_loader, batch_loss_history, step_size_history)
@@ -259,8 +260,8 @@ for expt in expts:
         epoch_loss = eval_loss(model, train_loader)
         epoch_loss_history.append(epoch_loss)
         if epoch % print_every == 0:
-            print("epoch {}, loss {}".format(epoch, epoch_loss)) 
-            
+            print(f"epoch {epoch}, loss {epoch_loss}") 
+
     label = '{}-final-loss{:0.3f}'.format(name, epoch_loss)
     results = {'label': label, 'batch_loss_history': batch_loss_history,
                'epoch_loss_history': epoch_loss_history, 'step_size_history': step_size_history}
@@ -276,7 +277,7 @@ pml.savefig('armijo-mnist-stepsize.pdf')
 plt.show()
 
 plt.figure()
-for name, results in results_dict.items():
+for results in results_dict.values():
     label = results['label']
     y = results['epoch_loss_history']
     plt.plot(y, label=label)
@@ -286,16 +287,16 @@ plt.show()
 
 # Add smoothed version of batch loss history to results dict    
 import pandas as pd
-for name, results in results_dict.items():
-    loss_history = results['batch_loss_history']  
+for results in results_dict.values():
+    loss_history = results['batch_loss_history']
     df = pd.Series(loss_history)
     nsteps = len(loss_history)
     smoothed = pd.Series.ewm(df, span=0.1*nsteps).mean()
     results['batch_loss_history_smoothed'] = smoothed
-    
+
 # Plot curves on one figure
-plt.figure() 
-for name, results in results_dict.items():
+plt.figure()
+for results in results_dict.values():
     label = results['label']
     y = results['batch_loss_history_smoothed']
     nsteps = len(y)

@@ -56,7 +56,7 @@ def demo(priorVar, plot_num):
     lower = (mu - 2 * np.sqrt(S2))
     plt.fill_between(allNdx, lower, upper, alpha=0.2)
 
-    for i in range(0, 3):
+    for _ in range(3):
         fs = np.random.multivariate_normal(mu, Sigma)
         plt.plot(allNdx, fs, 'k-', alpha=0.7)
 

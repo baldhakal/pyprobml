@@ -28,11 +28,11 @@ def clean_data(text):
     clean = clean.strip()
     lines = clean.split("\n")
     non_empty_lines = [line for line in lines if line.strip() != ""]
-    string_without_empty_lines = ""
-    for line in non_empty_lines:
-        if (len(line.split())==4):
-          string_without_empty_lines += line + "\n" 
-    out = re.sub(r"< .*? >", "", string_without_empty_lines) 
+    string_without_empty_lines = "".join(
+        line + "\n" for line in non_empty_lines if (len(line.split()) == 4)
+    )
+
+    out = re.sub(r"< .*? >", "", string_without_empty_lines)
     new = ""
     for i in range(13, len(string_without_empty_lines.split('\n'))-3):
       new = new + string_without_empty_lines.split('\n')[i] + "\n"

@@ -26,43 +26,21 @@ from sklearn.mixture import GaussianMixture
 
 from matplotlib.colors import LogNorm
 
-if 0:
-    K = 5 
-    blob_centers = np.array(
-        [[ 0.2,  2.3],
-         [-1.5 ,  2.3],
-         [-2.8,  1.8],
-         [-2.8,  2.8],
-         [-2.8,  1.3]])
-    blob_std = np.array([0.4, 0.3, 0.1, 0.1, 0.1])
-    X, y = make_blobs(n_samples=2000, centers=blob_centers,
-                      cluster_std=blob_std, random_state=7)
-    
-if 0:
-    X1, y1 = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
-    X1 = X1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
-    X2, y2 = make_blobs(n_samples=250, centers=1, random_state=42)
-    X2 = X2 + [6, -8]
-    X = np.r_[X1, X2]
-    y = np.r_[y1, y2]
-    K = 3
+# two off-diagonal blobs
+X1, _ = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
+X1 = X1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
+# three spherical blobs
+blob_centers = np.array(
+    [[ -4,  1],
+     [-4 ,  3],
+     [-4,  -2]])
+s = 0.5
+blob_std = np.array([s, s, s])
+X2, _ = make_blobs(n_samples=1000, centers=blob_centers,
+                  cluster_std=blob_std, random_state=7)
 
-if 1:
-    # two off-diagonal blobs
-    X1, _ = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
-    X1 = X1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
-    # three spherical blobs
-    blob_centers = np.array(
-        [[ -4,  1],
-         [-4 ,  3],
-         [-4,  -2]])
-    s = 0.5
-    blob_std = np.array([s, s, s])
-    X2, _ = make_blobs(n_samples=1000, centers=blob_centers,
-                      cluster_std=blob_std, random_state=7)
-    
-    X = np.r_[X1, X2]
-    K = 5
+X = np.r_[X1, X2]
+K = 5
 
 plt.figure()
 plt.scatter(X[:,0], X[:,1], 0.8)
@@ -86,7 +64,7 @@ X_full = np.vstack([xx.ravel(), yy.ravel()]).T
 # score_samples is the log pdf
 pdf = np.exp(gm.score_samples(X_full))
 pdf_probas = pdf * (1 / resolution) ** 2
-print('integral of pdf {}'.format(pdf_probas.sum()))
+print(f'integral of pdf {pdf_probas.sum()}')
 
 
 # https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm.html
@@ -155,13 +133,6 @@ def plot_gaussian_mixture(clusterer, X, resolution=1000, show_ylabels=True):
                 levels=np.logspace(0, 2, 12),
                 linewidths=1, colors='k')
 
-    # plot decision boundaries
-    if 0:
-        Z = clusterer.predict(np.c_[xx.ravel(), yy.ravel()])
-        Z = Z.reshape(xx.shape)
-        plt.contour(xx, yy, Z,
-                    linewidths=2, colors='r', linestyles='dashed')
-    
     plt.plot(X[:, 0], X[:, 1], 'k.', markersize=2)
     #plot_centroids(clusterer.means_, clusterer.weights_)
 
@@ -223,11 +194,10 @@ def make_plot(gm, X, name):
     plt.show()
 
 
-if 1:
-    make_plot(gm_full, X, 'full')
-    make_plot(gm_tied, X, 'tied')
-    make_plot(gm_spherical, X, 'spherical')
-    make_plot(gm_diag, X, 'diag')
+make_plot(gm_full, X, 'full')
+make_plot(gm_tied, X, 'tied')
+make_plot(gm_spherical, X, 'spherical')
+make_plot(gm_diag, X, 'diag')
 
 
 # Choosing K. Co,mpare to kmeans_silhouette
@@ -246,15 +216,6 @@ plt.plot(Ks, bics, "bo-", label="BIC")
 #plt.plot(Ks, aics, "go--", label="AIC")
 plt.xlabel("$k$", fontsize=14)
 plt.ylabel("Information Criterion", fontsize=14)
-#plt.axis([1, 9.5, np.min(aics) - 50, np.max(aics) + 50])
-if 0:
-    plt.annotate('Minimum',
-                 xy=(3, bics[2]),
-                 xytext=(0.35, 0.6),
-                 textcoords='figure fraction',
-                 fontsize=14,
-                 arrowprops=dict(facecolor='black', shrink=0.1)
-                )
 plt.legend()
 plt.tight_layout()
 plt.savefig("../figures/gmm_2d_bic_vs_k.pdf", dpi=300)

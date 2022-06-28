@@ -30,7 +30,7 @@ ytest = shp(ytest)
 
 def polyBasis(x, deg):
     #Expands a vector to a polynomial design matrix: from a constant to the deg-power
-    return(np.column_stack([x**deg for deg in range(0, deg+1)]))
+    return np.column_stack([x**deg for deg in range(deg+1)])
 
 def MakePlot(ypreds, SaveN, Title, lowerb = None, upperb = None):
     #Function for creating and saving plots
@@ -47,7 +47,7 @@ def MakePlot(ypreds, SaveN, Title, lowerb = None, upperb = None):
     if Errlogi:
         plt.legend(loc=2)
     plt.title(Title)
-    pml.savefig(SaveN +'.pdf')
+    pml.savefig(f'{SaveN}.pdf')
 
 xtrainp = polyBasis(xtrain,polydeg)
 xtestp = polyBasis(xtest,polydeg)

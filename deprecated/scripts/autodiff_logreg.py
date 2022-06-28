@@ -4,6 +4,7 @@ Demonstrate automatic differentiaiton on binary logistic regression
 using JAX, Torch and TF
 """
 
+
 import superimport
 
 import warnings
@@ -36,19 +37,19 @@ from jax.scipy.special import logsumexp
 from jax import grad, hessian, jacfwd, jacrev, jit, vmap
 from jax.experimental import optimizers
 from jax.experimental import stax
-print("jax version {}".format(jax.__version__))
+print(f"jax version {jax.__version__}")
 from jax.lib import xla_bridge
-print("jax backend {}".format(xla_bridge.get_backend().platform))
+print(f"jax backend {xla_bridge.get_backend().platform}")
 import os
 os.environ["XLA_FLAGS"]="--xla_gpu_cuda_data_dir=/home/murphyk/miniconda3/lib"
 
 
 import torch
 import torchvision
-print("torch version {}".format(torch.__version__))
+print(f"torch version {torch.__version__}")
 if torch.cuda.is_available():
     print(torch.cuda.get_device_name(0))
-    print("current device {}".format(torch.cuda.current_device()))
+    print(f"current device {torch.cuda.current_device()}")
 else:
     print("Torch cannot find GPU")
 
@@ -61,16 +62,16 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 #torch.backends.cudnn.benchmark = True
 
-        
+
 
 import tensorflow as tf
 from tensorflow import keras
-print("tf version {}".format(tf.__version__))
+print(f"tf version {tf.__version__}")
 if tf.test.is_gpu_available():
     print(tf.test.gpu_device_name())
 else:
     print("TF cannot find GPU")
-    
+
 tf.compat.v1.enable_eager_execution()       
     
 # We make some wrappers around random number generation
@@ -113,8 +114,7 @@ def NLL_grad(weights, batch):
     X, y = batch
     N = X.shape[0]
     mu = predict_prob(weights, X)
-    g = jnp.sum(np.dot(np.diag(mu - y), X), axis=0)/N
-    return g
+    return jnp.sum(np.dot(np.diag(mu - y), X), axis=0)/N
     
 
 
@@ -143,21 +143,21 @@ def setup_sklearn():
     w = w_mle_sklearn
     return w, X_test, y_test
 
-def  compute_gradients_manually(w, X_test, y_test):
+def compute_gradients_manually(w, X_test, y_test):
     y_pred = predict_prob(w, X_test)
     loss = NLL(w, (X_test, y_test))
     grad_np = NLL_grad(w, (X_test, y_test))
-    print("params {}".format(w))
+    print(f"params {w}")
     #print("pred {}".format(y_pred))
-    print("loss {}".format(loss))
-    print("grad {}".format(grad_np))
+    print(f"loss {loss}")
+    print(f"grad {grad_np}")
     return grad_np
 
 
 def compute_gradients_jax(w, X_test, y_test):
     print("Starting JAX demo")
     grad_jax = jax.grad(NLL)(w, (X_test, y_test))
-    print("grad {}".format(grad_jax))
+    print(f"grad {grad_jax}")
     return grad_jax
 
     
@@ -202,7 +202,7 @@ def compute_gradients_torch(w, X_test, y_test):
     print("Starting torch demo")
     N, D = X_test.shape
     w_torch = torch.Tensor(np.reshape(w, [D, 1])).to(device)
-    w_torch.requires_grad_() 
+    w_torch.requires_grad_()
     x_test_tensor = torch.Tensor(X_test).to(device)
     y_test_tensor = torch.Tensor(y_test).to(device)
     y_pred = torch.sigmoid(torch.matmul(x_test_tensor, w_torch))[:,0]
@@ -210,10 +210,10 @@ def compute_gradients_torch(w, X_test, y_test):
     loss_torch = criterion(y_pred, y_test_tensor)
     loss_torch.backward()
     grad_torch = w_torch.grad[:,0].numpy()
-    print("params {}".format(w_torch))
+    print(f"params {w_torch}")
     #print("pred {}".format(y_pred))
-    print("loss {}".format(loss_torch))
-    print("grad {}".format(grad_torch))
+    print(f"loss {loss_torch}")
+    print(f"grad {grad_torch}")
     return grad_torch
 
 def compute_gradients_torch_nn(w, X_test, y_test):
@@ -227,8 +227,7 @@ def compute_gradients_torch_nn(w, X_test, y_test):
             self.linear = torch.nn.Linear(D, 1, bias=False) 
             
         def forward(self, x):
-            y_pred = torch.sigmoid(self.linear(x))
-            return y_pred
+            return torch.sigmoid(self.linear(x))
     
     model = Model()
     # Manually set parameters to desired values
@@ -256,8 +255,8 @@ def compute_gradients_torch_nn(w, X_test, y_test):
 def compute_gradients_tf(w, X_test, y_test):
     print("Starting TF demo")
     N, D = X_test.shape
-    w_tf = tf.Variable(np.reshape(w, (D,1)))  
-    x_test_tf = tf.convert_to_tensor(X_test, dtype=np.float64) 
+    w_tf = tf.Variable(np.reshape(w, (D,1)))
+    x_test_tf = tf.convert_to_tensor(X_test, dtype=np.float64)
     y_test_tf = tf.convert_to_tensor(np.reshape(y_test, (-1,1)), dtype=np.float64)
     with tf.GradientTape() as tape:
         logits = tf.linalg.matmul(x_test_tf, w_tf)
@@ -266,11 +265,11 @@ def compute_gradients_tf(w, X_test, y_test):
         loss_tf = tf.reduce_mean(loss_batch, axis=0)
     grad_tf = tape.gradient(loss_tf, [w_tf])
     grad_tf = grad_tf[0][:,0].numpy()
-    
-    print("params {}".format(w_tf))
+
+    print(f"params {w_tf}")
     #print("pred {}".format(y_pred))
-    print("loss {}".format(loss_tf))
-    print("grad {}".format(grad_tf))
+    print(f"loss {loss_tf}")
+    print(f"grad {grad_tf}")
     return grad_tf
     
 
@@ -293,9 +292,9 @@ def compute_gradients_keras(w, X_test, y_test):
         loss_tf2 = tf.reduce_mean(loss_batch2, axis=0)
     grad_tf2 = tape.gradient(loss_tf2, model.trainable_variables)
     grad_tf2 = grad_tf2[0][:,0].numpy()
-    print("params {}".format(w_tf2))
-    print("loss {}".format(loss_tf2))
-    print("grad {}".format(grad_tf2))
+    print(f"params {w_tf2}")
+    print(f"loss {loss_tf2}")
+    print(f"grad {grad_tf2}")
     return grad_tf2
 
 

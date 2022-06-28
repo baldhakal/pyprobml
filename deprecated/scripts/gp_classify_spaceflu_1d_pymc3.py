@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import arviz as az
 
 from sklearn.datasets import load_iris
-    
+
 url = 'https://github.com/aloctavodia/BAP/blob/master/code/data/space_flu.csv?raw=true'
 
 df_sf = pd.read_csv(url)
@@ -35,8 +35,8 @@ with pm.Model() as model_space_flu:
     f = gp.prior('f', X=age)
     y_ = pm.Bernoulli('y', p=pm.math.sigmoid(f), observed=space_flu)
     trace_space_flu = pm.sample(1000, chains=1, cores=1, compute_convergence_checks=False)
-    
-    
+
+
 X_new = np.linspace(0, 80, 200)[:, None]
 
 with model_space_flu:
@@ -44,7 +44,7 @@ with model_space_flu:
     pred_samples = pm.sample_posterior_predictive(trace_space_flu,
                                                   var_names=['f_pred'],
                                                   samples=1000)
-    
+
 _, ax = plt.subplots(figsize=(10, 6))
 
 fp = logistic(pred_samples['f_pred'])

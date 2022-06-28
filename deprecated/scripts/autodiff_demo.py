@@ -46,28 +46,28 @@ if USE_TORCH:
     #torch.backends.cudnn.benchmark = True
    
 if USE_JAX:        
-    import jax
-    import jax.numpy as jnp
-    import numpy as np
-    from jax.scipy.special import logsumexp
-    from jax import grad, hessian, jacfwd, jacrev, jit, vmap
-    from jax.experimental import optimizers
-    print("jax version {}".format(jax.__version__))
-    from jax.lib import xla_bridge
-    print("jax backend {}".format(xla_bridge.get_backend().platform))
-    import os
-    os.environ["XLA_FLAGS"]="--xla_gpu_cuda_data_dir=/home/murphyk/miniconda3/lib"
-    
+   import jax
+   import jax.numpy as jnp
+   import numpy as np
+   from jax.scipy.special import logsumexp
+   from jax import grad, hessian, jacfwd, jacrev, jit, vmap
+   from jax.experimental import optimizers
+   print(f"jax version {jax.__version__}")
+   from jax.lib import xla_bridge
+   print(f"jax backend {xla_bridge.get_backend().platform}")
+   import os
+   os.environ["XLA_FLAGS"]="--xla_gpu_cuda_data_dir=/home/murphyk/miniconda3/lib"
+
 
 if USE_TF:
-    import tensorflow as tf
-    from tensorflow import keras
-    print("tf version {}".format(tf.__version__))
-    if tf.test.is_gpu_available():
-        print(tf.test.gpu_device_name())
-    else:
-        print("TF cannot find GPU")
-    tf.compat.v1.enable_eager_execution()
+   import tensorflow as tf
+   from tensorflow import keras
+   print(f"tf version {tf.__version__}")
+   if tf.test.is_gpu_available():
+       print(tf.test.gpu_device_name())
+   else:
+       print("TF cannot find GPU")
+   tf.compat.v1.enable_eager_execution()
 
 ### Dataset
 import sklearn.datasets
@@ -122,11 +122,10 @@ if True:
         return BCE_with_logits(logits, y)
         
     def NLL_grad(weights, batch):
-        X, y = batch
-        N = X.shape[0]
-        mu = predict_prob(weights, X)
-        g = jnp.sum(np.dot(np.diag(mu - y), X), axis=0)/N
-        return g
+       X, y = batch
+       N = X.shape[0]
+       mu = predict_prob(weights, X)
+       return jnp.sum(np.dot(np.diag(mu - y), X), axis=0)/N
     
     y_pred = predict_prob(w, X_test)
     loss = NLL(w, (X_test, y_test))
@@ -177,24 +176,24 @@ if USE_JAX:
     print("grad {}".format(grad_jax2))
 
 if USE_TORCH:
-    import torch
-    
-    print("Starting torch demo")
-    w_torch = torch.Tensor(np.reshape(w, [D, 1])).to(device)
-    w_torch.requires_grad_() 
-    x_test_tensor = torch.Tensor(X_test).to(device)
-    y_test_tensor = torch.Tensor(y_test).to(device)
-    y_pred = torch.sigmoid(torch.matmul(x_test_tensor, w_torch))[:,0]
-    criterion = torch.nn.BCELoss(reduction='mean')
-    loss_torch = criterion(y_pred, y_test_tensor)
-    loss_torch.backward()
-    grad_torch = w_torch.grad[:,0].numpy()
-    assert jnp.allclose(grad_np, grad_torch)
-    
-    print("params {}".format(w_torch))
+   import torch
+
+   print("Starting torch demo")
+   w_torch = torch.Tensor(np.reshape(w, [D, 1])).to(device)
+   w_torch.requires_grad_()
+   x_test_tensor = torch.Tensor(X_test).to(device)
+   y_test_tensor = torch.Tensor(y_test).to(device)
+   y_pred = torch.sigmoid(torch.matmul(x_test_tensor, w_torch))[:,0]
+   criterion = torch.nn.BCELoss(reduction='mean')
+   loss_torch = criterion(y_pred, y_test_tensor)
+   loss_torch.backward()
+   grad_torch = w_torch.grad[:,0].numpy()
+   assert jnp.allclose(grad_np, grad_torch)
+
+   print(f"params {w_torch}")
     #print("pred {}".format(y_pred))
-    print("loss {}".format(loss_torch))
-    print("grad {}".format(grad_torch))
+   print(f"loss {loss_torch}")
+   print(f"grad {grad_torch}")
  
 if USE_TORCH:
     print("Starting torch demo: Model version")
@@ -205,8 +204,7 @@ if USE_TORCH:
             self.linear = torch.nn.Linear(D, 1, bias=False) 
             
         def forward(self, x):
-            y_pred = torch.sigmoid(self.linear(x))
-            return y_pred
+           return torch.sigmoid(self.linear(x))
     
     model = Model()
     # Manually set parameters to desired values
@@ -232,44 +230,20 @@ if USE_TORCH:
     print("grad {}".format(grad_torch2))
     
 if USE_TF:
-    print("Starting TF demo")
-    w_tf = tf.Variable(np.reshape(w, (D,1)))  
-    x_test_tf = tf.convert_to_tensor(X_test, dtype=np.float64) 
-    y_test_tf = tf.convert_to_tensor(np.reshape(y_test, (-1,1)), dtype=np.float64)
-    with tf.GradientTape() as tape:
-        logits = tf.linalg.matmul(x_test_tf, w_tf)
-        y_pred = tf.math.sigmoid(logits)
-        loss_batch = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_test_tf, logits = logits)
-        loss_tf = tf.reduce_mean(loss_batch, axis=0)
-    grad_tf = tape.gradient(loss_tf, [w_tf])
-    grad_tf = grad_tf[0][:,0].numpy()
-    assert jnp.allclose(grad_np, grad_tf)
-    
-    print("params {}".format(w_tf))
+   print("Starting TF demo")
+   w_tf = tf.Variable(np.reshape(w, (D,1)))
+   x_test_tf = tf.convert_to_tensor(X_test, dtype=np.float64)
+   y_test_tf = tf.convert_to_tensor(np.reshape(y_test, (-1,1)), dtype=np.float64)
+   with tf.GradientTape() as tape:
+       logits = tf.linalg.matmul(x_test_tf, w_tf)
+       y_pred = tf.math.sigmoid(logits)
+       loss_batch = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_test_tf, logits = logits)
+       loss_tf = tf.reduce_mean(loss_batch, axis=0)
+   grad_tf = tape.gradient(loss_tf, [w_tf])
+   grad_tf = grad_tf[0][:,0].numpy()
+   assert jnp.allclose(grad_np, grad_tf)
+
+   print(f"params {w_tf}")
     #print("pred {}".format(y_pred))
-    print("loss {}".format(loss_tf))
-    print("grad {}".format(grad_tf))
-    
-if False:
-    # This no longer runs
-    print("Starting TF demo: keras version")
-    model = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(1, input_shape=(D,), activation=None, use_bias=False)
-            ])
-    #model.compile(optimizer='sgd', loss=tf.nn.sigmoid_cross_entropy_with_logits) 
-    model.build()
-    w_tf2 = tf.convert_to_tensor(np.reshape(w, (D,1)))
-    model.set_weights([w_tf2])
-    y_test_tf2 = tf.convert_to_tensor(np.reshape(y_test, (-1,1)), dtype=np.float32)
-    with tf.GradientTape() as tape:
-        logits_temp = model.predict(x_test_tf) # forwards pass only
-        logits2 = model(x_test_tf, training=True) # OO version enables backprop
-        loss_batch2 = tf.nn.sigmoid_cross_entropy_with_logits(y_test_tf2, logits2)
-        loss_tf2 = tf.reduce_mean(loss_batch2, axis=0)
-    grad_tf2 = tape.gradient(loss_tf2, model.trainable_variables)
-    grad_tf2 = grad_tf2[0][:,0].numpy()
-    assert jnp.allclose(grad_np, grad_tf2)
-    
-    print("params {}".format(w_tf2))
-    print("loss {}".format(loss_tf2))
-    print("grad {}".format(grad_tf2))
+   print(f"loss {loss_tf}")
+   print(f"grad {grad_tf}")

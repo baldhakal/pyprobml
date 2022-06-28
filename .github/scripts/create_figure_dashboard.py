@@ -60,15 +60,16 @@ def save_to_md(content, md_name):
 
 
 def check_latexify(code):
-    if "latexify" in code:
-        return True
-    return False
+    return "latexify" in code
 
 
 def check_jaxify(code):
-    if "import jax" in code or "import flax" in code or "from jax" in code or "from flax" in code:
-        return True
-    return False
+    return (
+        "import jax" in code
+        or "import flax" in code
+        or "from jax" in code
+        or "from flax" in code
+    )
 
 
 def check_fun_to_notebook(notebook, fun):
@@ -82,8 +83,7 @@ def check_fun_to_notebook(notebook, fun):
         return False
     for cell in nb.cells:
         code = cell["source"]
-        output = fun(code)
-        if output:
+        if output := fun(code):
             return True
     return False
 
@@ -93,8 +93,7 @@ def get_path_from_url(url, base_path="notebooks"):
     extract book_no/chap_name/nb_name.ipynb from url
     """
     book_no, chap_no, nb_name = url.split("/")[-3], url.split("/")[-2], url.split("/")[-1]
-    path = os.path.join(base_path, book_no, chap_no, nb_name)
-    return path
+    return os.path.join(base_path, book_no, chap_no, nb_name)
 
 
 parser = argparse.ArgumentParser(description="create figure dashboard")
@@ -146,12 +145,12 @@ for book_no in [1, 2]:
                     }
                 )
 
-        if len(notebooks) > 0:
+        if notebooks:
             df_nb = pd.DataFrame(notebooks)
             md = base_str + df_nb.to_markdown(index=None) + "\n</details>"
             # print(md)
             md_content += md + "\n\n"
-        
+
     print(f"*** {book_no}: {latexify_cnt} latexify found! ****")
     md_content = "## Instructions\n\n* Follow [the contributing guidelines](https://github.com/probml/pyprobml/blob/master/CONTRIBUTING.md) and specific instructions given over [here](https://github.com/probml/pyprobml/blob/master/notebooks/README.md).\n\nDashboard\n" + f"*** In {book_no}: {latexify_cnt} latexified notebooks found! ****\n" + md_content
     save_to_md(md_content, f"workflow_testing_indicator/dashboard_figures_book{book_no}.md")

@@ -59,11 +59,11 @@ for bag_size in bag_sizes:
     bag_clf.fit(X_train, y_train)
     y_pred = bag_clf.predict(X_test)
     bag_acc = accuracy_score(y_test, y_pred)
-    
+
     plt.figure()
     plot_decision_boundary(bag_clf, X, y)
     plt.title("Bag of {} decision trees, test accuracy={:0.2f}".format(
         bag_size, bag_acc))
-    plt.savefig('../figures/dtree_bag_size{}.pdf'.format(bag_size), dpi=300)
+    plt.savefig(f'../figures/dtree_bag_size{bag_size}.pdf', dpi=300)
 
 

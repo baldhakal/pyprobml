@@ -33,7 +33,7 @@ def make_contour_plot(G):
     plt.axis('equal')
     plt.title(G)
     plt.draw()
-    save_fig('gaussPlot2dDemoContour{}.pdf'.format(G))
+    save_fig(f'gaussPlot2dDemoContour{G}.pdf')
     plt.show()
     
 
@@ -46,7 +46,7 @@ def make_surface_plot(G):
     #ax.axis('equal')
     #ax.title(G)f
     plt.draw()
-    save_fig('gaussPlot2dDemoSurf{}.pdf'.format(G))
+    save_fig(f'gaussPlot2dDemoSurf{G}.pdf')
     plt.show()
     
 for g in Gs:

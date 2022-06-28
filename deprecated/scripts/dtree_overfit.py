@@ -16,14 +16,14 @@ from matplotlib.colors import ListedColormap
 
 def plot_surface(clf, X, y):
     plot_step = 0.02
-    
+
     plt.figure()
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, plot_step),
                          np.arange(y_min, y_max, plot_step))
     plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
-    
+
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
 
@@ -44,7 +44,7 @@ Xtest, ytest = make_moons(n_samples=1000, noise=0.25, random_state=2)
 depths = np.arange(1,10)
 scores_train = []
 scores_test= []
-for i, d in enumerate(depths):
+for d in depths:
     clf = DecisionTreeClassifier(random_state=42, max_depth=d)
     clf.fit(X, y)
     ypred = clf.predict(X)
@@ -57,7 +57,7 @@ for i, d in enumerate(depths):
     #plt.title(ttl)
     scores_train.append(score_train)
     scores_test.append(score_test)
-    
+
 plt.figure()
 plt.plot(depths, scores_train, label='train accuracy')
 plt.plot(depths, scores_test, label='test accuracy')

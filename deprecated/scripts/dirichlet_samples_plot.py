@@ -17,7 +17,7 @@ def MakeDirSampleFig(alpha):
     AlphaVec = np.repeat(alpha, NSamples)
     samps = np.random.dirichlet(AlphaVec, NSamples)
     fig, ax = plt.subplots(NSamples)
-    fig.suptitle('Samples from Dir (alpha=' + str(alpha) +')', y=1)
+    fig.suptitle(f'Samples from Dir (alpha={str(alpha)})', y=1)
     fig.tight_layout()
 
     for i in range(NSamples):
@@ -27,7 +27,7 @@ def MakeDirSampleFig(alpha):
         ax[i].set_xlim([min(X) - .5, max(X) + .5])
 
     plt.draw()
-    SaveN = "dirSample" + str(int(np.round(10*alpha))) + ".pdf"
+    SaveN = f"dirSample{int(np.round(10*alpha))}.pdf"
     pml.savefig(SaveN)
 
 MakeDirSampleFig(.1)

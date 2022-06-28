@@ -28,9 +28,9 @@ N_samples = np.array([1083, 855, 3461, 657, 1208, 1025, 527,
 
 group_idx = np.repeat(np.arange(len(N_samples)), N_samples)
 data = []
-for i in range(0, len(N_samples)):
+for i in range(len(N_samples)):
     data.extend(np.repeat([1, 0], [G_samples[i], N_samples[i]-G_samples[i]]))
-    
+
 with pm.Model() as model_h:
     μ = pm.Beta('μ', 1., 1.)
     κ = pm.HalfNormal('κ', 10)
@@ -39,7 +39,7 @@ with pm.Model() as model_h:
     y = pm.Bernoulli('y', p=θ[group_idx], observed=data)
 
     trace_h = pm.sample(1000, cores=1, chains=2)
-    
+
 az.plot_trace(trace_h)
 #plt.savefig('B11197_02_20.png', dpi=300)
 

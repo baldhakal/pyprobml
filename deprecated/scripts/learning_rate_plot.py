@@ -13,7 +13,7 @@ for t in ts:
     passed_num_thresholds = sum(t > tis)
     lr = lr0 * np.power(gamma, passed_num_thresholds)
     lr_list.append(lr)
-    
+
 plt.figure()
 plt.plot(lr_list)
 plt.title('piecewise constant')

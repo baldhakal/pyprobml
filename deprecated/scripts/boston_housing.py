@@ -38,11 +38,12 @@ plt.show()
 
 
 # scatter plot of response vs each feature 
-nrows = 3; ncols = 4;
+nrows = 3
+ncols = 4;
 fig, ax = plt.subplots(nrows=nrows, ncols=ncols, sharey=True, figsize=[15, 10])
 plt.tight_layout()
 plt.clf()
-for i in range(0,12):
+for i in range(12):
     plt.subplot(nrows, ncols, i+1)
     plt.scatter(X[:,i], y)
     plt.xlabel(boston.feature_names[i])

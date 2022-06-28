@@ -25,7 +25,7 @@ X = X.transpose()
 labels = kmeans.labels_
 clu_cen = kmeans.cluster_centers_
 
-clusters = [[] for i in range(0, 16)]
+clusters = [[] for _ in range(16)]
 
 for (i, l) in enumerate(labels):
     clusters[l].append(i)
@@ -35,7 +35,7 @@ times = times.reshape((7,))
 # Visualizing all the time series assigned to each cluster
 
 plt.figure()
-for l in range(0, 16):
+for l in range(16):
     plt.subplot(4, 4, l + 1)
     if clusters[l] != []:
         plt.plot(times, X[:, clusters[l]])
@@ -46,7 +46,7 @@ plt.show()
 # Visualizing the 16 cluster centers as prototypical time series.
 
 plt.figure()
-for l in range(0, 16):
+for l in range(16):
     plt.subplot(4, 4, l + 1).axis('off')
     plt.plot(times, clu_cen[l, :])
 plt.suptitle("K-Means centroids")

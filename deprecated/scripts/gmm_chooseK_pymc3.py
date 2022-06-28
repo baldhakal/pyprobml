@@ -17,8 +17,8 @@ np.random.seed(42)
 #url = 'https://github.com/aloctavodia/BAP/tree/master/code/data/chemical_shifts_theo_exp.csv?raw=true'
 # There is some error reading the abvoe file
 # Error tokenizing data. C error: Expected 1 fields in line 71, saw 2
-url = 'https://raw.githubusercontent.com/probml/probml-data/main/data/chemical_shifts_theo_exp.csv' 
-df= pd.read_csv(url, sep=',') 
+url = 'https://raw.githubusercontent.com/probml/probml-data/main/data/chemical_shifts_theo_exp.csv'
+df= pd.read_csv(url, sep=',')
 data = df['exp']
 
 clusters = [3, 4, 5, 6]
@@ -37,33 +37,33 @@ for cluster in clusters:
         trace = pm.sample(1000, tune=2000, random_seed=123, cores=1, chains=2)
         traces.append(trace)
         models.append(model)
-        
-        
+
+
 # Visualize fitted densities, compared to KDE
 _, ax = plt.subplots(2, 2, figsize=(11, 8), constrained_layout=True)
- 
+
 ax = np.ravel(ax)
 x = np.linspace(data.min(), data.max(), 200)
 for idx, trace_x in enumerate(traces):
     x_ = np.array([x] * clusters[idx]).T
- 
-    for i in range(50): # posterior samples
+
+    for _ in range(50):
         i_ = np.random.randint(0, len(trace_x))
         means_y = trace_x['means'][i_]
         p_y = trace_x['p'][i_]
         sd = trace_x['sd'][i_]
         dist = stats.norm(means_y, sd)
         ax[idx].plot(x, np.sum(dist.pdf(x_) * p_y, 1), 'C0', alpha=0.1)
- 
+
     means_y = trace_x['means'].mean(0)
     p_y = trace_x['p'].mean(0)
     sd = trace_x['sd'].mean()
     dist = stats.norm(means_y, sd)
     ax[idx].plot(x, np.sum(dist.pdf(x_) * p_y, 1), 'C0', lw=2)
     ax[idx].plot(x, dist.pdf(x_) * p_y, 'k--', alpha=0.7)
-         
+
     az.plot_kde(data, plot_kwargs={'linewidth':2, 'color':'k'}, ax=ax[idx])
-    ax[idx].set_title('K = {}'.format(clusters[idx]))
+    ax[idx].set_title(f'K = {clusters[idx]}')
     ax[idx].set_yticks([])
     ax[idx].set_xlabel('x')
 pml.savefig('gmm_chooseK_pymc3_kde.pdf')

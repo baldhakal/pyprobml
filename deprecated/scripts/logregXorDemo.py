@@ -19,15 +19,13 @@ def sqDistance(p, q):
     pSOS = np.sum(p ** 2, axis=1)
     qSOS = np.sum(q ** 2, axis=1)
     pSOS = np.repeat(pSOS[..., np.newaxis], len(qSOS), axis=1)
-    dist = pSOS + qSOS - 2 * np.dot(p, q.T)
-    return dist
+    return pSOS + qSOS - 2 * np.dot(p, q.T)
 
 
 def kernelRbfSigma(X1, X2, sigma):
     Z = 1.0 / np.sqrt(2 * np.pi * sigma ** 2)
     S = sqDistance(X1, X2)
-    K = Z * np.exp(-1 / (2 * sigma ** 2) * S)
-    return K
+    return Z * np.exp(-1 / (2 * sigma ** 2) * S)
 
 
 def createXORdata(doplot=False):

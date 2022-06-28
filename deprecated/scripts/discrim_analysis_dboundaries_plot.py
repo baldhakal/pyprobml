@@ -60,6 +60,7 @@ models = [model4]
 
 
 
+N = 100
 for n_th, (u, sigma) in enumerate(models):
     # generate random points
     x = []  # store sample points
@@ -73,7 +74,6 @@ for n_th, (u, sigma) in enumerate(models):
     labels = np.hstack(y)
     x_min, y_min = np.min(points, axis=0)
     x_max, y_max = np.max(points, axis=0)
-    N = 100
     x_range = np.linspace(x_min - 1, x_max + 1, N)
     y_range = np.linspace(y_min - 1, y_max + 1, N)
     xx, yy = np.meshgrid(x_range, y_range)
@@ -93,7 +93,7 @@ for n_th, (u, sigma) in enumerate(models):
         for j in range(nclasses):
             plt.contour(xx, yy, z_p[:, j].reshape(N, N),
                        [0.5], lw=3, colors='k')
-        
+
         #draw points
         for i, point in enumerate(x):
             plt.plot(point[:, 0], point[:, 1], c[i] + m[i])
@@ -105,7 +105,7 @@ for n_th, (u, sigma) in enumerate(models):
 
         plt.title('Seperate {0} classes using {1}'.
                  format(nclasses, model_names[k]))
-        save_fig('discrimAnalysisDboundariesDemo{}.pdf'.format(n_th * 2 + k))
+        save_fig(f'discrimAnalysisDboundariesDemo{n_th * 2 + k}.pdf')
 
 
 

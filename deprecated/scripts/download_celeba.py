@@ -97,11 +97,7 @@ class CelebADataset(Dataset):
         # Check if files have been downloaded already
         files_exist = False
         for label_file in label_files:
-            if os.path.isfile(os.path.join(self.root, label_file)):
-                files_exist = True
-            else:
-                files_exist = False
-
+            files_exist = bool(os.path.isfile(os.path.join(self.root, label_file)))
         if files_exist:
             print("Files exist already")
         else:
@@ -261,21 +257,21 @@ flags.DEFINE_string(
 )
 
 def celeba_dataloader(bs, IMAGE_SIZE, CROP, DATA_PATH):
-    trans = []
-    trans.append(transforms.RandomHorizontalFlip())
+    trans = [transforms.RandomHorizontalFlip()]
     if CROP > 0:
         trans.append(transforms.CenterCrop(CROP))
     trans.append(transforms.Resize(IMAGE_SIZE))
     trans.append(transforms.ToTensor())
     transform = transforms.Compose(trans)
 
-    dm = CelebADataModule(data_dir=DATA_PATH,
-                                target_type='attr',
-                                train_transform=transform,
-                                val_transform=transform,
-                                download=True,
-                                batch_size=bs)
-    return dm
+    return CelebADataModule(
+        data_dir=DATA_PATH,
+        target_type='attr',
+        train_transform=transform,
+        val_transform=transform,
+        download=True,
+        batch_size=bs,
+    )
 
 
 def main(argv):

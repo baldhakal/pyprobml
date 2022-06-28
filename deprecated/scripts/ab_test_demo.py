@@ -11,8 +11,7 @@ import pyprobml_utils as pml
 def optimal_sample_size(N, s, sigma):
     # eqn 10
     t = (s/sigma)**2
-    n = np.sqrt(0.25*N*t + (0.75*t)**2) - 0.75*t
-    return n
+    return np.sqrt(0.25*N*t + (0.75*t)**2) - 0.75*t
 
 def prob_error(n1, n2, s, sigma):
     # eqn 12

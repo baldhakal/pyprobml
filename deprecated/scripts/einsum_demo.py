@@ -34,10 +34,10 @@ assert np.allclose(np.sum(np.sum(T, axis=0), axis=0), np.einsum('ijkl->kl', T))
 
 # repeated indices with one arg extracts diagonals
 assert np.allclose(np.diag(S), np.einsum('ii->i', S))
-          
+
 # Trace
 assert np.allclose(np.trace(S), np.einsum('ii->', S))
-          
+
 
 ## Two arguments
 
@@ -61,7 +61,10 @@ assert np.allclose(A * A, np.einsum('ij,ij->ij', A, A))
 assert np.allclose(np.multiply(A, A), np.einsum('ij,ij->ij', A, A))
 
 # Batch matrix multiplication
-I= 3; J = 2; K = 5; L = 3;
+I= 3
+J = 2
+K = 5
+L = 3;
 AA = np.random.randn(I,J,K)
 BB = np.random.randn(I,K,L)
 # C[ijl] = sum_k A[ijk] B[ikl]
@@ -69,16 +72,18 @@ CC = np.zeros((I,J,L))
 for i in range(I):
     for j in range(J):
         for l in range(L):
-            s = 0
-            for k in range(K):
-                s += AA[i,j,k] * BB[i,k,l]
+            s = sum(AA[i,j,k] * BB[i,k,l] for k in range(K))
             CC[i,j,l] = s
 assert np.allclose(CC, np.einsum('ijk,ikl->ijl', AA, BB))
 
 ## >2 arguments
 
 # Batch sentence embedding and averaging
-N = 2; C = 3; D = 4; K = 5; T = 6;
+N = 2
+C = 3
+D = 4
+K = 5
+T = 6;
 S = np.random.randn(N, T, K)
 W = np.random.randn(K, D)
 V = np.random.randn(D, C)

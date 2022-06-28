@@ -13,8 +13,7 @@ n_samples = 20000
 sigma = 3 
 
 def halfgaussian_logpdf(x):
-  out = np.log(np.exp(-x**2/sigma))*np.heaviside(-x,1)
-  return out
+  return np.log(np.exp(-x**2/sigma))*np.heaviside(-x,1)
 
 xs = np.arange(-3*sigma, 3*sigma, 0.1)
 y = np.exp(halfgaussian_logpdf(xs))

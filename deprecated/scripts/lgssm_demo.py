@@ -41,7 +41,7 @@ initial_state_prior = ssm.MultivariateNormal(mu0, Sigma0)
 kf = ssm.LinearGaussianStateSpaceModel(transition_matrix, transition_noise,
                                        observation_matrix, observation_noise,
                                        initial_state_prior)
-                                
+
 n_samples = 5
 key = random.PRNGKey(31415)
 state_samples, obs_samples = kf.sample(seed=key, sample_shape=n_samples, num_timesteps=num_timesteps)

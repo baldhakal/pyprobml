@@ -34,12 +34,12 @@ inertias = np.empty((K, 2))
 for k in range(1, K+1):
     kmeans_ = KMeans(n_clusters=k, random_state=42)
     minibatch_kmeans = MiniBatchKMeans(n_clusters=k, random_state=42)
-    print("\r{}/{}".format(k, 100), end="")
+    print(f"\r{k}/100", end="")
     times[k-1, 0] = timeit("kmeans_.fit(X)", number=10, globals=globals())
     times[k-1, 1]  = timeit("minibatch_kmeans.fit(X)", number=10, globals=globals())
     inertias[k-1, 0] = kmeans_.inertia_
     inertias[k-1, 1] = minibatch_kmeans.inertia_
-    
+
 plt.figure(figsize=(10,5))
 
 plt.subplot(121)

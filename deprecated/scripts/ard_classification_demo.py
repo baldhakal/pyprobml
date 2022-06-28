@@ -40,7 +40,7 @@ def generate_dataset(n_samples = 500, n_features = 100,
 def run_demo(n_samples, n_features):
     np.random.seed(42)
     X,Y = generate_dataset(n_samples,n_features)
-    
+
     plt.figure(figsize = (8,6))
     plt.plot(X[Y==0,0],X[Y==0,1],"bo", markersize = 3)
     plt.plot(X[Y==1,0],X[Y==1,1],"ro", markersize = 3)
@@ -48,31 +48,20 @@ def run_demo(n_samples, n_features):
     plt.ylabel('feature 2')
     plt.title("Example of dataset")
     plt.show()
-    
+
     # training & test data
     X,x,Y,y = train_test_split(X,Y, test_size = 0.4)
-    
-    models = list()
-    names = list()
-    
-    models.append(ClassificationARD())
-    names.append('logreg-ARD-Laplace')
-    
+
+    models = [ClassificationARD()]
     models.append(VBClassificationARD())
-    names.append('logreg-ARD-VB')
-    
     models.append(LogisticRegressionCV(penalty = 'l2', cv=3))
-    names.append('logreg-CV-L2')
-    
     models.append(LogisticRegressionCV(penalty = 'l1', solver = 'liblinear', cv=3))
-    names.append('logreg-CV-L1')
-    
-        
+    names = ['logreg-ARD-Laplace', 'logreg-ARD-VB', 'logreg-CV-L2', 'logreg-CV-L1']
     nmodels = len(models)
     for i in range(nmodels):
-        print('\nfitting {}'.format(names[i]))
+        print(f'\nfitting {names[i]}')
         models[i].fit(X,Y)
-                    
+
     # construct grid    
     n_grid = 100
     max_x      = np.max(x[:,0:2],axis = 0)
@@ -86,7 +75,7 @@ def run_demo(n_samples, n_features):
     Xg         = np.random.randn(n_grid**2,n_features)
     Xg[:,0]    = Xgrid[:,0]
     Xg[:,1]    = Xgrid[:,1]
-    
+
     # estimate probabilities for grid data points
     #preds = [0]*nmodels # iniitialize list
     for i in range(nmodels):
@@ -96,8 +85,8 @@ def run_demo(n_samples, n_features):
         ax.plot(x[y==0,0],x[y==0,1],"bo", markersize = 5)
         ax.plot(x[y==1,0],x[y==1,1],"ro", markersize = 5)
         nnz = np.sum(models[i].coef_ != 0)
-        ax.set_title('method {}, N={}, D={}, nnz {}'.format(names[i], n_samples, n_features, nnz))
-        name = '{}-N{}-D{}.pdf'.format(names[i], n_samples, n_features)
+        ax.set_title(f'method {names[i]}, N={n_samples}, D={n_features}, nnz {nnz}')
+        name = f'{names[i]}-N{n_samples}-D{n_features}.pdf'
         save_fig(name)
         plt.show()
     

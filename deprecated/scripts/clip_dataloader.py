@@ -32,8 +32,7 @@ class _Clip_ds(Dataset):
     def __getitem__(self, index):
         image = self.X[index]
         label = self.labels[index]
-        sample = (image, label)
-        return sample
+        return image, label
 
     transform = transforms.Compose([
     ])

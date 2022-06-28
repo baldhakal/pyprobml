@@ -53,7 +53,7 @@ for deg in degs:
     mse_train[deg-1] = mse(ytrain_pred, ytrain) 
     mse_test[deg-1] = mse(ytest_pred, ytest)
     ytest_pred_stored[deg-1] = ytest_pred
-    
+
 # Plot MSE vs degree
 fig, ax = plt.subplots()
 mask = degs <= 15
@@ -73,10 +73,10 @@ for deg in chosen_degs:
     ax.scatter(xtrain, ytrain)
     ax.plot(xtest, ytest_pred_stored[deg-1])
     ax.set_ylim((-10, 15))
-    plt.title('degree {}'.format(deg))
-    pml.savefig('polyfitDegree{}.pdf'.format(deg))
+    plt.title(f'degree {deg}')
+    pml.savefig(f'polyfitDegree{deg}.pdf')
     plt.show()
-    
+
 # Plot residuals
 for deg in chosen_degs:
     fig, ax = plt.subplots()
@@ -88,8 +88,8 @@ for deg in chosen_degs:
     ax.set_xlabel('x')
     ax.set_ylabel('residual')
     ax.set_ylim(-6,6)
-    plt.title('degree {}. Predictions on the training set'.format(deg))
-    pml.savefig('polyfitDegree{}Residuals.pdf'.format(deg))
+    plt.title(f'degree {deg}. Predictions on the training set')
+    pml.savefig(f'polyfitDegree{deg}Residuals.pdf')
     plt.show()
 
 # Plot fit vs actual
@@ -110,5 +110,5 @@ for deg in chosen_degs:
         ax.set_ylabel('predicted y')
         r2 = sklearn.metrics.r2_score(ytrue, ypred)
         plt.title('degree {}. R2 on {} = {:0.3f}'.format(deg, dataset, r2))
-        pml.savefig('polyfitDegree{}FitVsActual{}.pdf'.format(deg, dataset))
+        pml.savefig(f'polyfitDegree{deg}FitVsActual{dataset}.pdf')
         plt.show()

@@ -32,17 +32,13 @@ def energy(ix, iy, X, J):
 
 def gibbs(rng, pixelX, pixelY, J, niter=50000):
   X = ( 2 * ( rng.random( (pixelX, pixelY) )> 0.5 ) - 1 )
-  for iter in tqdm(range(niter)):
-
-    ix = np.ceil((pixelX-1) * rng.random(1)).astype(int)  
+  for _ in tqdm(range(niter)):
+    ix = np.ceil((pixelX-1) * rng.random(1)).astype(int)
     iy = np.ceil((pixelY-1) * rng.random(1)).astype(int)
-    
+
     e = energy(ix, iy, X, J)
-  
-    if rng.random(1) < sigmoid(e):
-      X[ iy, ix] = 1
-    else:
-      X[ iy, ix] = -1
+
+    X[ iy, ix] = 1 if rng.random(1) < sigmoid(e) else -1
   return X
 
 #temps = [5, 2.5, 0.1]
@@ -60,5 +56,5 @@ for t, J in enumerate(Jvals):
   #ax.set_title(f"Temperature {T}")
   ax.set_title(f"J={J}")
   plt.tight_layout()
-  pml.savefig('gibbsDemoIsing{}.pdf'.format(t))
+  pml.savefig(f'gibbsDemoIsing{t}.pdf')
   plt.show()

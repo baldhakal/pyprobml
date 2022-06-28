@@ -22,8 +22,7 @@ def sample_mvn(mu, Sigma, N):
     L = np.linalg.cholesky(Sigma)
     D = len(mu)
     Z = np.random.randn(N, D)
-    X = np.dot(Z, L.T) + np.reshape(mu, (-1,D))
-    return X
+    return np.dot(Z, L.T) + np.reshape(mu, (-1,D))
 
 # test
 D = 5

@@ -13,7 +13,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 import arviz as az
 import pyprobml_utils as pml
-    
+
 N = 10 # nun samples per group
 M = 8 # num groups
 idx = np.repeat(range(M-1), N) # N samples for groups 0-6

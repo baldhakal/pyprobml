@@ -24,7 +24,7 @@ def T(x, f, n_steps=10):
     """
     Transition distribution: T(x'|x) using n-steps Metropolis sampler
     """
-    for t in range(n_steps):
+    for _ in range(n_steps):
         # Proposal
         x_prime = x + np.random.randn()
 

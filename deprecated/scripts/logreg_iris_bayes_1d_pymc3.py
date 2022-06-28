@@ -17,36 +17,23 @@ import arviz as az
 from sklearn.datasets import load_iris
 import pyprobml_utils as pml
 
-if 0:
-    # SAT data from 
-    # https://github.com/probml/pmtk3/blob/master/demos/logregSATdemoBayes.m
-     
-    X = [525,533,545,582,581,576,572,609,559,543,576,525,574,582,574,
-          471,595,557,557,584,599,517,649,584,463,591,488,563,553,549];
-          
-    y = [0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,0,0,1,1,0,1,1,0,1,0,1,1,1];
-    
-    x_n = 'SAT'
-    x_0 = np.array(X)
-    y_0 = np.array(y)
-else:
-    iris = load_iris()
-    X = iris.data 
-    y = iris.target
-    
-    # Convert to pandas dataframe 
-    df_iris = pd.DataFrame(data=iris.data, 
-                        columns=['sepal_length', 'sepal_width', 
-                                 'petal_length', 'petal_width'])
-    df_iris['species'] = pd.Series(iris.target_names[y], dtype='category')
-    
-    
-    df = df_iris.query("species == ('setosa', 'versicolor')")
-    y_0 = pd.Categorical(df['species']).codes
-    x_n = 'sepal_length' 
-    x_0 = df[x_n].values
-    
-xmean = np.mean(x_0)    
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Convert to pandas dataframe 
+df_iris = pd.DataFrame(data=iris.data, 
+                    columns=['sepal_length', 'sepal_width', 
+                             'petal_length', 'petal_width'])
+df_iris['species'] = pd.Series(iris.target_names[y], dtype='category')
+
+
+df = df_iris.query("species == ('setosa', 'versicolor')")
+y_0 = pd.Categorical(df['species']).codes
+x_n = 'sepal_length'
+x_0 = df[x_n].values
+
+xmean = np.mean(x_0)
 x_c = x_0 - xmean
 
 print(x_c)
@@ -57,19 +44,19 @@ print(x_c)
 with pm.Model() as model_0:
     α = pm.Normal('α', mu=0, sd=10)
     β = pm.Normal('β', mu=0, sd=10)
-    
+
     μ = α + pm.math.dot(x_c, β)    
     θ = pm.Deterministic('θ', pm.math.sigmoid(μ))
     bd = pm.Deterministic('bd', -α/β) # decision boundary
-    
+
     yl = pm.Bernoulli('yl', p=θ, observed=y_0)
 
     trace_0 = pm.sample(1000, cores=1, chains=2)
-    
+
 
 varnames = ['α', 'β', 'bd']
 az.summary(trace_0, varnames)
-           
+
 
 theta = trace_0['θ'].mean(axis=0)
 idx = np.argsort(x_c)

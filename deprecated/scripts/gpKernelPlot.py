@@ -11,7 +11,7 @@ import pyprobml_utils as pml
 def gpKernelPlot(seed):
     if seed == 1:
         return 
-    
+
     X = np.array([1, 2, 3])
     X_t = np.atleast_2d(X).transpose()
     X = X_t * 2
@@ -33,14 +33,14 @@ def gpKernelPlot(seed):
     se_output_var = 2
 
     se_kernel = lambda x, y: se_output_var*(np.exp(-0.5 * ((x - y) ** 2) / se_length_scale**2))
-    
+
     lin_output_var = 0.5
     lin_kernel = lambda x, y: lin_output_var*((x + 1) * (y + 1))
     poly_lin_kernel = lambda x, y: lin_output_var*(1 + x * y)
 
     quad_output_var = 0.5
     quad_kernel = lambda x, y: quad_output_var*((1 + x * y) ** 2)
-    
+
     s2f = 1
     f1 = lambda t: 1
     f3 = lambda t: 1 + t
@@ -50,7 +50,7 @@ def gpKernelPlot(seed):
     matern_kernel_1 = lambda x, y: m(sqrt(1) * abs(x - y), f1)
     matern_kernel_3 = lambda x, y: m(sqrt(3) * abs(x - y), f3)
     matern_kernel_5 = lambda x, y: m(sqrt(5) * abs(x - y), f5)
-    
+
     longse_length_scale = 20
     longse_output_var = 10
     longse_kernel = lambda x, y: longse_output_var*(np.exp(-0.5 * ((x - y) ** 2) / longse_length_scale**2))
@@ -110,7 +110,7 @@ def gpKernelPlot(seed):
         samples = default_rng().multivariate_normal(np.zeros(np.shape(x_range_1d)), K, n_samples)
         samples = np.atleast_2d(samples).transpose()
         samples = samples + np.tile(np.arange(1, n_samples + 1, 1) * 5 - 10, (n_xstar, 1))
-        
+
         plt.plot(x_range_1d, samples)
         plt.title(k, fontsize=12)
         plt.axis('off')

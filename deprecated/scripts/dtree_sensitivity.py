@@ -16,14 +16,14 @@ def plot_surface(clf, X, y, xnames, ynames):
     n_classes = 3
     plot_step = 0.02
     markers = [ 'o', 's', '^']
-    
+
     plt.figure()
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, plot_step),
                          np.arange(y_min, y_max, plot_step))
     plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
-    
+
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
     plt.xlabel(xnames[0])
@@ -53,7 +53,7 @@ iris = load_iris()
 
 #ndx = [0, 2] # sepal length, petal length
 ndx = [2, 3] # petal lenght and width
-X = iris.data[:, ndx] 
+X = iris.data[:, ndx]
 y = iris.target
 xnames = [iris.feature_names[i] for i in ndx]
 ynames = iris.target_names
@@ -111,16 +111,6 @@ plt.savefig('../figures/dtree_iris_depth2_rotated.pdf', dpi=300)
 plt.show()
 
 
-## Ensemble of tree fit to original and tweaked data
-
-if 0:
-    from sklearn.ensemble import VotingClassifier
-    
-    eclf = VotingClassifier(
-        estimators=[('orig', tree_clf), ('tweaked', tree_clf_tweaked)],
-        voting='hard')
-    plot_surface(eclf, X, y, xnames, ynames)
-    
 from prefit_voting_classifier import PrefitVotingClassifier
 
 eclf = PrefitVotingClassifier(

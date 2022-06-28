@@ -31,7 +31,7 @@ class ConvAEModule(nn.Module):
         for i in range(len(encoder_conv_filters)):
             self.enc_convs.append(nn.Conv2d(all_channels[i], all_channels[i + 1],
                                             kernel_size=3, stride=2, padding=1))
-            if not self.latent_dim == 2:
+            if self.latent_dim != 2:
                 self.enc_convs.append(nn.BatchNorm2d(all_channels[i + 1]))
             self.enc_convs.append(nn.LeakyReLU())
 
@@ -75,7 +75,7 @@ class ConvAEModule(nn.Module):
             self.dec_t_convs.append(nn.UpsamplingNearest2d(scale_factor=2))
             self.dec_t_convs.append(nn.ConvTranspose2d(all_t_channels[i], all_t_channels[i + 1],
                                                        3, stride=1, padding=1))
-            if not self.latent_dim == 2:
+            if self.latent_dim != 2:
                 self.dec_t_convs.append(nn.BatchNorm2d(all_t_channels[i + 1]))
             self.dec_t_convs.append(nn.LeakyReLU())
 
@@ -87,8 +87,7 @@ class ConvAEModule(nn.Module):
     def reparameterize(self, mu, log_var):
         std = torch.exp(0.5 * log_var)  # standard deviation
         eps = torch.randn_like(std) # `randn_like` as we need the same size
-        sample = mu + (eps * std)  # sampling
-        return sample
+        return mu + (eps * std)
     
     def _run_step(self, x):
       mu, log_var = self.encode(x)
@@ -125,10 +124,9 @@ class ConvAEModule(nn.Module):
         mu, log_var = self.encode(x)
         if self.deterministic:
             return self.decode(mu), mu, None
-        else:
-            z = self.reparameterize(mu, log_var)
-            recon = self.decode(z)
-            return recon, mu, log_var
+        z = self.reparameterize(mu, log_var)
+        recon = self.decode(z)
+        return recon, mu, log_var
 
 class ConvAE(LightningModule):
     def __init__(self,input_shape,

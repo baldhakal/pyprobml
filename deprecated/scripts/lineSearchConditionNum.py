@@ -19,11 +19,11 @@ def gradient_descent(x0, f, f_prime, hessian, stepsize = None, nsteps=50):
                     Steepest-Descent algorithm with option for line search
     """
     x_i, y_i = x0
-    all_x_i = list()
-    all_y_i = list()
-    all_f_i = list()
+    all_x_i = []
+    all_y_i = []
+    all_f_i = []
 
-    for i in range(1, nsteps):
+    for _ in range(1, nsteps):
         all_x_i.append(x_i)
         all_y_i.append(y_i)
         x = np.array([x_i, y_i])
@@ -49,13 +49,11 @@ def gradient_descent(x0, f, f_prime, hessian, stepsize = None, nsteps=50):
 
 def make_plot(A, b, c, fname):
     def objective(x): # x is (2,)
-        f =  jnp.dot(x, jnp.dot(A, x)) + jnp.dot(x,b) + c
-        return f
+        return jnp.dot(x, jnp.dot(A, x)) + jnp.dot(x,b) + c
     
     
     def objective_vectorized(X): # x is (N,2)
-        f = vmap(objective)(X)
-        return f
+        return vmap(objective)(X)
     
     
     def gradient(x):

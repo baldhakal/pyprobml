@@ -3,6 +3,7 @@
 Author: Ang Ming Liang
 """
 
+
 import superimport
 
 import numpy as np
@@ -24,14 +25,13 @@ Kmatrix = np.eye(K)
 offdi = la.toeplitz([0,1]+[0]*(size-2))
 I = np.eye(size)
 A = (np.kron(offdi,I) + np.kron(I,offdi)).astype(int)
-A_id = A*np.arange(size*size)
+A_id = A * np.arange(size**2)
 
 @njit
 def energy(state_mat, pos, Jvalue):
   neigh_states = state_mat[pos][A_id[pos] > 0]
   neigh_states_one_hot = Kmatrix[neigh_states]
-  E = Jvalue*np.sum(neigh_states_one_hot, axis=0)
-  return E
+  return Jvalue*np.sum(neigh_states_one_hot, axis=0)
 
 @njit
 def sample(logits):
@@ -45,14 +45,14 @@ def gibbs_sampler(jvalue, niter=100):
   X = np.random.randint(0, K,  size=(size*size, ))
   state_mat = X*A
 
-  for iter in range(niter):
+  for _ in range(niter):
     for x in range(size):
       for y in range(size):
         pos = x + y*size
 
         E = energy(state_mat, pos, jvalue)
         rv = sample(E)
-        
+
         X[pos] = rv
         state_mat[:, pos][A_id[pos] > 0] = rv
 

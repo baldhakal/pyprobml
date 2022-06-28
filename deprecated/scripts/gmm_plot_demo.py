@@ -40,8 +40,7 @@ def sigmaEllipse2D(mu, Sigma, level=3, npoints=128):
     x = np.cos(phi)
     y = np.sin(phi)
     z = level*np.vstack((x, y))
-    xy = mu + linalg.sqrtm(Sigma).dot(z)
-    return xy
+    return mu + linalg.sqrtm(Sigma).dot(z)
 
 
 def plot_sigma_levels(mu, P):
@@ -73,14 +72,12 @@ def plot_sigma_vector(Mu, Sigma):
 plot_sigma_vector(Mu, Sigma)
 
 def plot_gaussian_mixture(Mu, Sigma, weights=None, x = None, y = None):
-    if x == None:
+    if x is None:
         x = np.arange(0, 1, 0.01)
-    if y == None:
+    if y is None:
         y = np.arange(-0.5, 1.2, 0.01)
 
-    if len(Mu) == len(Sigma) == len(weights):
-        pass
-    else:
+    if not len(Mu) == len(Sigma) == len(weights):
         print("Error: Mu, Sigma and weights must have the same dimension")
         return
 

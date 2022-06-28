@@ -16,8 +16,8 @@ import pandas as pd
 
 import jax
 from jax import lax, ops, random
-print("jax version {}".format(jax.__version__))
-print("jax backend {}".format(jax.lib.xla_bridge.get_backend().platform))
+print(f"jax version {jax.__version__}")
+print(f"jax backend {jax.lib.xla_bridge.get_backend().platform}")
 
 import jax.numpy as jnp
 from jax import random, vmap
@@ -121,53 +121,52 @@ def HMC2(U, grad_U, epsilon, L, current_q, rng):
     }
 
 def make_plot(step=0.03, L=11):
-  Q = {}
-  Q["q"] = jnp.array([-0.1, 0.2])
-  pr = 0.4 #0.31
-  plt.figure()
-  plt.subplot(ylabel=r"$\mu_y$", xlabel=r"$\mu_x$", xlim=(-pr, pr), ylim=(-pr, pr))
-  n_samples = 4
-  path_col = (0, 0, 0, 0.5)
-  for r in 0.075 * jnp.arange(2, 6):
-      plt.gca().add_artist(plt.Circle((0, 0), r, alpha=0.2, fill=False))
-  plt.scatter(Q["q"][0], Q["q"][1], c="k", marker="x", zorder=4)
-  for i in range(n_samples):
-      Q = HMC2(U, U_gradient, step, L, Q["q"], random.fold_in(random.PRNGKey(0), i))
-      if n_samples < 10:
-          for j in range(L):
-              K0 = jnp.sum(Q["ptraj"][j] ** 2) / 2
-              plt.plot(
-                  Q["traj"][j : j + 2, 0],
-                  Q["traj"][j : j + 2, 1],
-                  c=path_col,
-                  lw=1 + 2 * K0,
-              )
-          plt.scatter(Q["traj"][:, 0], Q["traj"][:, 1], c="white", s=5, zorder=3)
-          # for fancy arrows
-          dx = Q["traj"][L, 0] - Q["traj"][L - 1, 0]
-          dy = Q["traj"][L, 1] - Q["traj"][L - 1, 1]
-          d = jnp.sqrt(dx ** 2 + dy ** 2)
-          plt.annotate(
-              "",
-              (Q["traj"][L - 1, 0], Q["traj"][L - 1, 1]),
-              (Q["traj"][L, 0], Q["traj"][L, 1]),
-              arrowprops={"arrowstyle": "<-"},
-          )
-          plt.annotate(
-              str(i + 1),
-              (Q["traj"][L, 0], Q["traj"][L, 1]),
-              xytext=(3, 3),
-              textcoords="offset points",
-          )
-      plt.scatter(
-          Q["traj"][L + 1, 0],
-          Q["traj"][L + 1, 1],
-          c=("red" if jnp.abs(Q["dH"]) > 0.1 else "black"),
-          zorder=4,
-      )
-      #plt.axis('square')
-      plt.title(f'L={L}')
-      plt.savefig(f'../figures/hmc2d_L{L}.pdf', dpi=300)
+    Q = {"q": jnp.array([-0.1, 0.2])}
+    pr = 0.4 #0.31
+    plt.figure()
+    plt.subplot(ylabel=r"$\mu_y$", xlabel=r"$\mu_x$", xlim=(-pr, pr), ylim=(-pr, pr))
+    n_samples = 4
+    path_col = (0, 0, 0, 0.5)
+    for r in 0.075 * jnp.arange(2, 6):
+        plt.gca().add_artist(plt.Circle((0, 0), r, alpha=0.2, fill=False))
+    plt.scatter(Q["q"][0], Q["q"][1], c="k", marker="x", zorder=4)
+    for i in range(n_samples):
+        Q = HMC2(U, U_gradient, step, L, Q["q"], random.fold_in(random.PRNGKey(0), i))
+        if n_samples < 10:
+            for j in range(L):
+                K0 = jnp.sum(Q["ptraj"][j] ** 2) / 2
+                plt.plot(
+                    Q["traj"][j : j + 2, 0],
+                    Q["traj"][j : j + 2, 1],
+                    c=path_col,
+                    lw=1 + 2 * K0,
+                )
+            plt.scatter(Q["traj"][:, 0], Q["traj"][:, 1], c="white", s=5, zorder=3)
+            # for fancy arrows
+            dx = Q["traj"][L, 0] - Q["traj"][L - 1, 0]
+            dy = Q["traj"][L, 1] - Q["traj"][L - 1, 1]
+            d = jnp.sqrt(dx ** 2 + dy ** 2)
+            plt.annotate(
+                "",
+                (Q["traj"][L - 1, 0], Q["traj"][L - 1, 1]),
+                (Q["traj"][L, 0], Q["traj"][L, 1]),
+                arrowprops={"arrowstyle": "<-"},
+            )
+            plt.annotate(
+                str(i + 1),
+                (Q["traj"][L, 0], Q["traj"][L, 1]),
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
+        plt.scatter(
+            Q["traj"][L + 1, 0],
+            Q["traj"][L + 1, 1],
+            c=("red" if jnp.abs(Q["dH"]) > 0.1 else "black"),
+            zorder=4,
+        )
+        #plt.axis('square')
+        plt.title(f'L={L}')
+        plt.savefig(f'../figures/hmc2d_L{L}.pdf', dpi=300)
 
 make_plot(step=0.03, L=11) # no U-turn
 plt.show()
