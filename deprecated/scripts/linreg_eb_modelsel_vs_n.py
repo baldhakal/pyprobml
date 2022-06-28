@@ -70,7 +70,7 @@ if __name__ == "__main__":
             plt.plot(x_true, y_true, c="tab:green", linewidth=2)
             plt.title(f"{deg}= | logev={logL:0.2f}", fontsize=12)
             pml.savefig(f"linreg-N{N}-d{deg}.pdf")
-        
+
         fig, ax = plt.subplots()
         L_norm = np.exp(logLs)
         L_norm = L_norm / L_norm.sum()

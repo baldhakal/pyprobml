@@ -42,7 +42,7 @@ def check(api_url):
             temp_d["n"]=i["name"]
             li.append(temp_d)
             temp_d={}
-        
+
     for i in reversed(li):
         cumulative=cumulative+i["c"]
         i["cumulative"]=cumulative      

@@ -9,22 +9,19 @@ def compute_image_resize(image, width = None, height = None):
     # grab the image size
     dim = None
     (h, w) = image.shape[:2]
-    
+
     # check to see if the width is None
     if width is None:
         # calculate the ratio of the height and construct the
         # dimensions
         r = height / float(h)
-        dim = (int(w * r), height)
-    
-    # otherwise, the height is None
+        return int(w * r), height
+
     else:
         # calculate the ratio of the width and construct the
         # dimensions
         r = width / float(w)
-        dim = (width, int(h * r))
-    
-    return dim
+        return width, int(h * r)
  
     
 def image_resize(img_path,size=None,ratio=None):
@@ -54,8 +51,8 @@ def git_ssh(git_command, email, username, verbose=False):
     # git commands
     if verbose:
         print('Executing git commands')
-    os.system('git config --global user.email {}'.format(email))
-    os.system('git config --global user.name {}'.format(username))
+    os.system(f'git config --global user.email {email}')
+    os.system(f'git config --global user.name {username}')
     os.system(git_command)
     # cleanup
     if verbose:

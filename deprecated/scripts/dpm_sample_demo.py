@@ -22,7 +22,8 @@ mu = np.zeros((2, 1))  # mean of means
 mv = 8*np.ones((2, 1))  # std of means
 ax = 30
 
-for trial, seed in enumerate(seeds):
+ss = [50, 200, 500, 1000]
+for seed in seeds:
     np.random.seed(seed)
     # Sample from CRP prior
     T = []
@@ -54,9 +55,8 @@ for trial, seed in enumerate(seeds):
 
     # Plot
     bb = np.arange(0, 2*np.pi, .02)
-    ss = [50, 200, 500, 1000]
     plt.figure()
-    for jj, sj in enumerate(ss):
+    for sj in ss:
         hh, _ = np.histogram(zz[:sj], np.arange(0, max(zz[:sj])))
         cc = np.where(hh >= 1)[0]
         plt.plot(xx[0, :sj], xx[1, :sj], '.', markersize=7)
@@ -70,5 +70,5 @@ for trial, seed in enumerate(seeds):
             plt.xticks([])
             plt.yticks([])
             N = sj
-        pml.savefig("dpmSampleSeed%sN%s.pdf" % (seed, N))
+        pml.savefig(f"dpmSampleSeed{seed}N{N}.pdf")
         plt.show()

@@ -72,8 +72,7 @@ def make_einsum_string(dag):
     # example: if dag is  B <- A -> C, returns 'A,B,C,  A,BA,CA->' 
     node_names = list(dag.keys())
     cpt_names = [n + ''.join(dag[n]) for n in node_names] # indices for CPTs
-    str = ','.join(node_names) + ',' + ','.join(cpt_names) + '->'
-    return str
+    return ','.join(node_names) + ',' + ','.join(cpt_names) + '->'
 
 def make_list_of_factors(dag, params, evectors):
     # Extract dictionary elements in same order as einsum string
@@ -97,12 +96,11 @@ def network_poly(dag, params, evectors, elim_order=None):
 def make_evidence_vectors(cardinality, evidence):
     # compute l(i,j)=1 iff x(i)=j is compatible with evidence e
     def f(nstates, val):
-         if val == -1:
-             vec = jnp.ones(nstates) 
-         else: 
-             #vec[val] = 1.0 # not allowed to mutate state in jax
-             vec = index_update(np.zeros(nstates), index[val], 1.0) # functional assignment
-         return vec
+        return (
+            jnp.ones(nstates)
+            if val == -1
+            else index_update(np.zeros(nstates), index[val], 1.0)
+        )
     return {name: f(nstates, evidence.get(name, -1)) for name, nstates in cardinality.items()}
 
 def marginal_probs(dag, params, evidence, elim_order=None):
@@ -110,15 +108,12 @@ def marginal_probs(dag, params, evidence, elim_order=None):
     cardinality = {name: jnp.shape(CPT)[0] for name, CPT in params.items()}
     evectors = make_evidence_vectors(cardinality, evidence)
     f = lambda ev: network_poly(dag, params, ev, elim_order) # clamp model parameters
-    prob_ev = f(evectors) 
+    prob_ev = f(evectors)
     grads = grad(f)(evectors) # list of derivatives wrt evectors
-    probs = dict()
+    probs = {}
     for name in dag.keys():
         ev = evidence.get(name, -1)
-        if ev == -1: # not observed
-            probs[name] = grads[name] / prob_ev  
-        else:
-            probs[name] = evectors[name] # clamped node
+        probs[name] = grads[name] / prob_ev if ev == -1 else evectors[name]
         probs[name] = np.array(probs[name]) # cast back to vanilla numpy array
     return prob_ev, probs
 
@@ -132,10 +127,7 @@ def compute_elim_order(dag, params):
     str = make_einsum_string(dag)
     factors = make_list_of_factors(dag, params, evectors)
     nnodes = len(dag.keys())
-    #print('computing elimination order for DAG with {} nodes'.format(nnodes))
-    #elim_order = jnp.einsum_path(str, *factors, optimize='optimal')[0]
-    elim_order = jnp.einsum_path(str, *factors, optimize='greedy')[0]
-    return elim_order
+    return jnp.einsum_path(str, *factors, optimize='greedy')[0]
         
 # Class that provides syntactic sugar on top of above functions.
 class BayesNetInfAutoDiff:

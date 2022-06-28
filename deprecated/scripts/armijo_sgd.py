@@ -50,7 +50,7 @@ class SGD_Armijo(torch.optim.Optimizer):
                 found = 0
                 step_size_old = step_size
 
-                for e in range(100):
+                for _ in range(100):
                     # try a prospective step
                     self._try_update(step_size, x_current, gradient)
 
@@ -63,7 +63,7 @@ class SGD_Armijo(torch.optim.Optimizer):
                                                       grad_norm=grad_norm,
                                                       loss_temp=loss_temp, 
                                                       params=self.defaults)
-                    
+
                     found, step_size, step_size_old = wolfe_results
 
                     if found == 1:
@@ -114,7 +114,7 @@ def wolfe_line_search(step_size, step_size_old, loss, grad_norm,
 def reset_step(state, params):
     step_size = state['step_size']
 
-    if 'beta_2' in params and not params['beta_2'] is None:
+    if 'beta_2' in params and params['beta_2'] is not None:
         beta_2 = params['beta_2']
     else:
         beta_2 = 2.0
@@ -135,9 +135,9 @@ def get_grads(param_groups):
     if not isinstance(param_groups[0], dict):
         param_groups = [{'params': param_groups}]
 
-    for i, group in enumerate(param_groups):
+    for group in param_groups:
         grad_group = []
-        for j, p in enumerate(group['params']):
+        for p in group['params']:
             grad_copy = torch.zeros_like(p.grad.data).copy_(p.grad.data)
             grad_group.append(grad_copy)
             grad_norm = grad_norm + torch.sum(torch.mul(grad_copy, grad_copy))

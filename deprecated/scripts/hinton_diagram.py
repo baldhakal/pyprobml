@@ -85,10 +85,7 @@ class IndexLocator(ticker.Locator):
     def __call__(self):
         """Return the locations of the ticks."""
         dmin, dmax = self.axis.get_data_interval()
-        if dmax < self.max_ticks:
-            step = 1
-        else:
-            step = np.ceil(dmax / self.max_ticks)
+        step = 1 if dmax < self.max_ticks else np.ceil(dmax / self.max_ticks)
         return self.raise_if_exceeds(np.arange(0, dmax, step))
     
 plt.figure()

@@ -139,5 +139,5 @@ class EMNISTDataModule(VisionDataModule):
 
     def show_example(self, data):
         img, label = data
-        print("Label: ("+self.to_char(label)+")")
+        print(f"Label: ({self.to_char(label)})")
         plt.imshow(img[0], cmap="gray")

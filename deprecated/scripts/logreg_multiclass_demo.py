@@ -75,6 +75,6 @@ for i in range(len(models)):
     #plt.scatter(X[:,0], X[:,1], y)
     plt.title(names[i])
     plt.draw()
-    pml.savefig('logregMulti{}Boundary.png'.format(file_names[i]))
-    
+    pml.savefig(f'logregMulti{file_names[i]}Boundary.png')
+
 plt.show()

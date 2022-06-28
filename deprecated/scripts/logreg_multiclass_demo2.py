@@ -46,9 +46,9 @@ nclasses = len(np.unique(y))
 degrees = [1, 2, 10, 20]
 
 
-for i, degree in enumerate(degrees):
+for degree in degrees:
     transformer = PolynomialFeatures(degree)
-    name = 'Degree{}'.format(degree)
+    name = f'Degree{degree}'
     XX = transformer.fit_transform(X)[:, 1:]  # skip the first column of 1s
     model = LogisticRegression(C=1.0)
     model = model.fit(XX, y)
@@ -72,7 +72,7 @@ for i, degree in enumerate(degrees):
     #plt.scatter(X[:,0], X[:,1], y)
     plt.title(name)
 
-    fname = 'logregMulti-{}.png'.format(name)
+    fname = f'logregMulti-{name}.png'
     save_fig(fname)
     plt.draw()
 

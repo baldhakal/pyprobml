@@ -20,15 +20,6 @@ N_samples = np.array([1083, 855, 3461, 657, 1208, 1025, 527,
 
 G_samples = np.array([1,    0,    3,    0,   1,    5,     11])
 N_samples = np.array([1083, 855, 3461, 657, 1208, 5000, 10000])
-
-if False:
-    with pm.Model() as model:
-        μ = pm.Beta('μ', 1., 1.)
-        κ = pm.HalfNormal('κ', 10)
-        theta = pm.Beta('θ', alpha=μ*κ, beta=(1.0-μ)*κ, shape=len(N_samples))
-        #y = pm.Bernoulli('y', p=θ[group_idx], observed=data)
-        y = pm.Binomial('y', p=theta, observed=G_samples, n=N_samples)
-        trace = pm.sample(1000, cores=1, chains=2)
     
 #https://docs.pymc.io/notebooks/GLM-hierarchical-binominal-model.html
     

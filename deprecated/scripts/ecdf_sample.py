@@ -45,7 +45,7 @@ for idx, (dist, x) in enumerate(zip(dists, xs)):
         ax[idx,0].set_title('pdf(X)')
         ax[idx,1].set_title('cdf(Y)')
         ax[idx,2].set_title('pdf(Y)')
-        
+
 plt.tight_layout()       
 pml.savefig('ecdf_sample.pdf', dpi=300)
 plt.show()
@@ -57,12 +57,12 @@ for idx, (dist, x) in enumerate(zip(dists, xs)):
     plt.plot(x, dist.pdf(x)) 
     if idx==0: plt.title('pdf(X)')
     pml.savefig(f'ecdf_{idx}_pdfX.pdf', dpi=300)
-        
+
     plt.figure()
     plt.plot(np.sort(data), np.linspace(0, 1, len(data)))
     if idx==0: plt.title('cdf(Y)')
     pml.savefig(f'ecdf_{idx}_cdfY.pdf', dpi=300)
-    
+
     fig, ax = plt.subplots()
     az.plot_kde(data, ax=ax)
     if idx==0: plt.title('pdf(Y)')

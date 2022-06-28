@@ -49,13 +49,15 @@ def linreg_imputation_model(X, y):
         if no_of_missed != 0:
             # each nan value is associated with a imputed variable of std normal prior.
             X_impute[i] = numpyro.sample(
-                "X_impute_{}".format(i), dist.Normal(0, 1).expand([no_of_missed]).mask(False))
+                f"X_impute_{i}",
+                dist.Normal(0, 1).expand([no_of_missed]).mask(False),
+            )
+
 
             # merging the observed data with the imputed values.
             missed_idx = np.nonzero(np.isnan(X[:, i]))[0]
             X_merged[i] = ops.index_update(X[:, i], missed_idx, X_impute[i])
 
-        # if there are no missing values, its just the observed data.
         else:
             X_merged[i] = X[:, i]
 

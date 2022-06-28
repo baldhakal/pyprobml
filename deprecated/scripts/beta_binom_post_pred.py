@@ -27,7 +27,7 @@ for k in range(N + 1):
 
 fig, ax = plt.subplots()
 ax.bar(np.arange(N + 1), prior_pred_dist, align='center', color='grey')
-ax.set_title(f"Prior predictive distribution", fontweight='bold')
+ax.set_title("Prior predictive distribution", fontweight='bold')
 ax.set_xlim(-1, 21)
 ax.set_xticks(list(range(N + 1)))
 ax.set_xticklabels(list(range(N + 1)))
@@ -36,7 +36,7 @@ ax.set_xlabel("number of success")
 
 fig, ax = plt.subplots()
 ax.bar(np.arange(N + 1), post_pred_dist, align='center', color='grey')
-ax.set_title(f"Posterior predictive distribution", fontweight='bold')
+ax.set_title("Posterior predictive distribution", fontweight='bold')
 ax.set_xlim(-1, 21)
 ax.set_xticks(list(range(N + 1)))
 ax.set_xticklabels(list(range(N + 1)))

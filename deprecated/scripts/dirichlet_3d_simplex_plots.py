@@ -95,19 +95,19 @@ alphas = [[0.1] * 3,
           [5] * 3,
           [50] * 3,
           [2, 5, 15]]
-for (i, alpha) in enumerate(alphas):
+for alpha in alphas:
     plt.figure(figsize=(8,8))
     dist = Dirichlet(alpha)
     draw_pdf_contours(dist)
     title = r'$\alpha$ = (%.3f, %.3f, %.3f)' % tuple(alpha)
     plt.title(title, fontdict={'fontsize': 12})
     a0 = int(np.round(alpha[0]*10))
-    pml.savefig('dirichletHeatmap{}.jpg'.format(a0))
+    pml.savefig(f'dirichletHeatmap{a0}.jpg')
     plt.show()
-     
+
     plt.figure(figsize=(8,8))
     plot_points(dist.sample(5000))
-    pml.savefig('dirichletSample{}.jpg'.format(a0))
+    pml.savefig(f'dirichletSample{a0}.jpg')
     plt.show()
 
     

@@ -32,61 +32,60 @@ def update_precisions(Q,S,q,s,A,active,tol,n_samples,clf_bias):
     '''
     # initialise vector holding changes in log marginal likelihood
     deltaL = np.zeros(Q.shape[0])
-    
+
     # identify features that can be added , recomputed and deleted in model
-    theta        =  q**2 - s 
+    theta        =  q**2 - s
     add          =  (theta > 0) * (active == False)
     recompute    =  (theta > 0) * (active == True)
     delete       = ~(add + recompute)
-    
+
     # compute sparsity & quality parameters corresponding to features in 
     # three groups identified above
     Qadd,Sadd      = Q[add], S[add]
     Qrec,Srec,Arec = Q[recompute], S[recompute], A[recompute]
     Qdel,Sdel,Adel = Q[delete], S[delete], A[delete]
-    
+
     # compute new alpha's (precision parameters) for features that are 
     # currently in model and will be recomputed
     Anew           = s[recompute]**2/ ( theta[recompute] + np.finfo(np.float32).eps)
     delta_alpha    = (1./Anew - 1./Arec)
-    
+
     # compute change in log marginal likelihood 
     deltaL[add]       = ( Qadd**2 - Sadd ) / Sadd + np.log(Sadd/Qadd**2 )
     denom = np.maximum(1e-5, 1 + Srec*delta_alpha) # Kevin Murphy hack
     deltaL[recompute] = Qrec**2 / (Srec + 1. / delta_alpha) - np.log(denom)
     deltaL[delete]    = Qdel**2 / (Sdel - Adel) - np.log(1 - Sdel / Adel)
     deltaL            = deltaL  / n_samples
-    
+
     # find feature which caused largest change in likelihood
     feature_index = np.argmax(deltaL)
-             
+
     # no deletions or additions
     same_features  = np.sum( theta[~recompute] > 0) == 0
-    
+
     # changes in precision for features already in model is below threshold
     no_delta       = np.sum( abs( Anew - Arec ) > tol ) == 0
-    
+
     # check convergence: if no features to add or delete and small change in 
     #                    precision for current features then terminate
     converged = False
     if same_features and no_delta:
         converged = True
         return [A,converged]
-    
+
     # if not converged update precision parameter of weights and return
     if theta[feature_index] > 0:
         A[feature_index] = s[feature_index]**2 / theta[feature_index]
         if active[feature_index] == False:
             active[feature_index] = True
-    else:
-        # at least two active features
-        if active[feature_index] == True and np.sum(active) >= 2:
-            # do not remove bias term in classification 
-            # (in regression it is factored in through centering)
-            if not (feature_index == 0 and clf_bias):
-               active[feature_index] = False
-               A[feature_index]      = np.PINF
-                
+    elif (
+        active[feature_index] == True
+        and np.sum(active) >= 2
+        and (feature_index != 0 or not clf_bias)
+    ):
+        active[feature_index] = False
+        A[feature_index]      = np.PINF
+
     return [A,converged]
 
 
@@ -156,7 +155,7 @@ class RegressionARD(LinearModel,RegressorMixin):
                   copy_X = True, verbose = False):
         self.n_iter          = n_iter
         self.tol             = tol
-        self.scores_         = list()
+        self.scores_ = []
         self.fit_intercept   = fit_intercept
         self.copy_X          = copy_X
         self.verbose         = verbose
@@ -207,16 +206,12 @@ class RegressionARD(LinearModel,RegressorMixin):
 
         #  initialise precision of noise & and coefficients
         var_y  = np.var(y)
-        
+
         # check that variance is non zero !!!
-        if var_y == 0 :
-            beta = 1e-2
-        else:
-            beta = 1. / np.var(y)
-        
+        beta = 1e-2 if var_y == 0 else 1. / np.var(y)
         A      = np.PINF * np.ones(n_features)
         active = np.zeros(n_features , dtype = np.bool)
-        
+
         # in case of almost perfect multicollinearity between some features
         # start from feature 0
         if np.sum( XXd - X_mean**2 < np.finfo(np.float32).eps ) > 0:
@@ -228,13 +223,13 @@ class RegressionARD(LinearModel,RegressorMixin):
             start = np.argmax(proj)
             active[start] = True
             A[start]      = XXd[start]/( proj[start] - var_y)
- 
+
         warning_flag = 0
         for i in range(self.n_iter):
             XXa     = XX[active,:][:,active]
             XYa     = XY[active]
             Aa      =  A[active]
-            
+
             # mean & covariance of posterior distribution
             Mn,Ri,cholesky  = self._posterior_dist(Aa,beta,XXa,XYa)
             if cholesky:
@@ -242,16 +237,16 @@ class RegressionARD(LinearModel,RegressorMixin):
             else:
                 Sdiag  = np.copy(np.diag(Ri)) 
                 warning_flag += 1
-            
+
             # raise warning in case cholesky failes
             if warning_flag == 1:
                 warnings.warn(("Cholesky decomposition failed ! Algorithm uses pinvh, "
                                "which is significantly slower, if you use RVR it "
                                "is advised to change parameters of kernel"))
-                
+
             # compute quality & sparsity parameters            
             s,q,S,Q = self._sparsity_quality(XX,XXd,XY,XYa,Aa,Ri,active,beta,cholesky)
-                
+
             # update precision parameter for noise distribution
             rss     = np.sum( ( y - np.dot(X[:,active] , Mn) )**2 )
             beta    = n_samples - np.sum(active) + np.sum(Aa * Sdiag )
@@ -263,11 +258,14 @@ class RegressionARD(LinearModel,RegressorMixin):
             if self.verbose:
                 print(('Iteration: {0}, number of features '
                        'in the model: {1}').format(i,np.sum(active)))
-            if converged or i == self.n_iter - 1:
-                if converged and self.verbose:
+            if converged:
+                if self.verbose:
                     print('Algorithm converged !')
                 break
-                 
+
+            elif i == self.n_iter - 1:
+                break
+
         # after last update of alpha & beta update parameters
         # of posterior distribution
         XXa,XYa,Aa         = XX[active,:][:,active],XY[active],A[active]
@@ -326,14 +324,13 @@ class RegressionARD(LinearModel,RegressorMixin):
             R    = np.linalg.cholesky(Sinv)
             Z    = solve_triangular(R,beta*XY, check_finite=False, lower = True)
             Mn   = solve_triangular(R.T,Z, check_finite=False, lower = False)
-            
+
             # invert lower triangular matrix from cholesky decomposition
             Ri   = solve_triangular(R,np.eye(A.shape[0]), check_finite=False, lower=True)
-            if full_covar:
-                Sn   = np.dot(Ri.T,Ri)
-                return Mn,Sn,cholesky
-            else:
+            if not full_covar:
                 return Mn,Ri,cholesky
+            Sn   = np.dot(Ri.T,Ri)
+            return Mn,Sn,cholesky
         except LinAlgError:
             cholesky = False
             Sn   = pinvh(Sinv)
@@ -481,7 +478,7 @@ class ClassificationARD(BaseEstimator,LinearClassifierMixin):
             Returns self.
         '''
         X, y = check_X_y(X, y, accept_sparse = None, dtype=np.float64)
-                    
+
         # normalize, if required
         if self.normalize:
             self._x_mean = np.mean(X,0)
@@ -500,10 +497,7 @@ class ClassificationARD(BaseEstimator,LinearClassifierMixin):
             raise ValueError("Need samples of at least 2 classes"
                              " in the data, but the data contains only one"
                              " class: %r" % self.classes_[0])
-        
-        # if multiclass use OVR (i.e. fit classifier for each class)
-        if n_classes < 2:
-            raise ValueError("Need samples of at least 2 classes")
+
         if n_classes > 2:
             self.coef_, self.sigma_        = [0]*n_classes,[0]*n_classes
             self.intercept_ , self.active_ = [0]*n_classes, [0]*n_classes
@@ -511,12 +505,9 @@ class ClassificationARD(BaseEstimator,LinearClassifierMixin):
         else:
             self.coef_, self.sigma_, self.intercept_,self.active_ = [0],[0],[0],[0]
             self.lambda_                                          = [0]
-         
+
         for i in range(len(self.classes_)):
-            if n_classes == 2:
-                pos_class = self.classes_[1]
-            else:
-                pos_class = self.classes_[i]
+            pos_class = self.classes_[1] if n_classes == 2 else self.classes_[i]
             mask = (y == pos_class)
             y_bin = np.zeros(y.shape, dtype=np.float64)
             y_bin[mask] = 1
@@ -525,7 +516,7 @@ class ClassificationARD(BaseEstimator,LinearClassifierMixin):
             self.active_[i], self.lambda_[i] = active, lambda_
             # in case of binary classification fit only one classifier           
             if n_classes == 2:
-                break  
+                break
         self.coef_      = np.asarray(self.coef_)
         self.intercept_ = np.asarray(self.intercept_)
         return self
@@ -604,16 +595,14 @@ class ClassificationARD(BaseEstimator,LinearClassifierMixin):
         '''
         probs   = self.predict_proba(X)
         indices = np.argmax(probs, axis = 1)
-        y_pred  = self.classes_[indices]
-        return y_pred
+        return self.classes_[indices]
         
         
     def _decision_function_active(self,X,coef_,active_,intercept_):
         ''' Constructs decision function using only relevant features '''
         if self.normalize:
             X = (X - self._x_mean[active_]) / self._x_std[active_]
-        decision = safe_sparse_dot(X,coef_[active_]) + intercept_
-        return decision
+        return safe_sparse_dot(X,coef_[active_]) + intercept_
         
         
     def decision_function(self,X):
@@ -668,21 +657,19 @@ class ClassificationARD(BaseEstimator,LinearClassifierMixin):
         if y_hat.ndim == 1:
             pr   = self._convo_approx(X[:,self.lambda_[0]!=np.PINF],
                                            y_hat,self.sigma_[0])
-            prob = np.vstack([1 - pr, pr]).T
+            return np.vstack([1 - pr, pr]).T
         else:
             pr   = [self._convo_approx(X[:,idx != np.PINF],y_hat[:,i],
                         self.sigma_[i]) for i,idx in enumerate(self.lambda_) ]
             pr   = np.asarray(pr).T
-            prob = pr / np.reshape(np.sum(pr, axis = 1), (pr.shape[0],1))
-        return prob
+            return pr / np.reshape(np.sum(pr, axis = 1), (pr.shape[0],1))
 
         
     def _convo_approx(self,X,y_hat,sigma):
         ''' Computes approximation to convolution of sigmoid and gaussian'''
         var = np.sum(np.dot(X,sigma)*X,1)
         ks  = 1. / ( 1. + np.pi * var/ 8)**0.5
-        pr  = expit(y_hat * ks)
-        return pr
+        return expit(y_hat * ks)
         
 
     def _sparsity_quality(self,X,Xa,y,B,A,Aa,active,Sn,cholesky):
@@ -856,7 +843,7 @@ class RVR(RegressionARD):
         # kernelise features
         K = get_kernel( X, X, self.gamma, self.degree, self.coef0, 
                        self.kernel, self.kernel_params)
-        
+
         # use fit method of RegressionARD
         _ = super(RVR,self).fit(K,y)
 

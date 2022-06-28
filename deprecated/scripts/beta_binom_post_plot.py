@@ -29,7 +29,10 @@ def make_graph(data, save_name):
         label=f"prior Beta({data['prior']['a']}, {data['prior']['b']})",
         linewidth=2.0,
     )
-    fig2 = axt.plot(x, likelihood, "r:", label=f"likelihood Bernoulli", linewidth=2.0)
+    fig2 = axt.plot(
+        x, likelihood, "r:", label="likelihood Bernoulli", linewidth=2.0
+    )
+
     fig3 = ax.plot(
         x,
         posterior,

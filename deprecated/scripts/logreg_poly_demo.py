@@ -23,12 +23,10 @@ import pyprobml_utils as pml
 
 
 def plot_data(ax, X, y, is_train=True):
-    X0 = X[:,0]; X1 = X[:,1]
+    X0 = X[:,0]
+    X1 = X[:,1]
     colors = [ 'red', 'blue']
-    if is_train:
-        markers = ['x', '*']
-    else:
-        markers = ['o', 's']
+    markers = ['x', '*'] if is_train else ['o', 's']
     for x0, x1, cls in zip(X0, X1, y):
         color = colors[int(cls)-1]
         marker = markers[int(cls)-1]
@@ -58,7 +56,8 @@ def make_data(ntrain, ntest):
     return Xtrain, ytrain, Xtest, ytest, xx, yy
 
 
-ntrain = 50; ntest = 1000;
+ntrain = 50
+ntest = 1000;
 Xtrain, ytrain, Xtest, ytest, xx, yy  = make_data(ntrain, ntest)
 
 
@@ -71,7 +70,7 @@ plot_list = C_list
 err_train_list = []
 err_test_list = []
 w_list = []
-for i, C in enumerate(C_list):
+for C in C_list:
     transformer = PolynomialFeatures(degree)
     name = 'Reg{:d}-Degree{}'.format(int(C), degree)
     XXtrain = transformer.fit_transform(Xtrain)[:, 1:]  # skip the first column of 1s
@@ -81,22 +80,22 @@ for i, C in enumerate(C_list):
     w_list.append(w)
     ytrain_pred = model.predict(XXtrain)
     nerrors_train = np.sum(ytrain_pred != ytrain)
-    err_train_list.append(nerrors_train / ntrain)                      
+    err_train_list.append(nerrors_train / ntrain)
     XXtest = transformer.fit_transform(Xtest)[:, 1:]  # skip the first column of 1s
     ytest_pred = model.predict(XXtest)
     nerrors_test = np.sum(ytest_pred != ytest)
     err_test_list.append(nerrors_test / ntest)
-    
+
     if C in plot_list:
         fig, ax = plt.subplots()
         plot_predictions(ax, xx, yy, transformer, model)
         plot_data(ax, Xtrain, ytrain, is_train=True)
         #plot_data(ax, Xtest, ytest, is_train=False)
         ax.set_title(name)
-        fname = 'logreg_poly_surface-{}.png'.format(name)
+        fname = f'logreg_poly_surface-{name}.png'
         pml.save_fig(fname)
         plt.draw()
-    
+
 
 plt.figure()
 plt.plot(C_list, err_train_list, 'x-', label='train')
@@ -105,5 +104,5 @@ plt.legend()
 plt.xscale('log')
 plt.xlabel('Inverse regularization')
 plt.ylabel('error rate')
-pml.save_fig('logreg_poly_vs_reg-Degree{}.pdf'.format(degree))
+pml.save_fig(f'logreg_poly_vs_reg-Degree{degree}.pdf')
 plt.show()

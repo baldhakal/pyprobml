@@ -280,7 +280,9 @@ def RGBToPyCmap(rgbdata):
     nsteps = rgbdata.shape[0]
     stepaxis = np.linspace(0, 1, nsteps)
 
-    rdata=[]; gdata=[]; bdata=[]
+    rdata=[]
+    gdata=[]
+    bdata=[]
     for istep in range(nsteps):
         r = rgbdata[istep,0]
         g = rgbdata[istep,1]
@@ -289,11 +291,7 @@ def RGBToPyCmap(rgbdata):
         gdata.append((stepaxis[istep], g, g))
         bdata.append((stepaxis[istep], b, b))
 
-    mpl_data = {'red':   rdata,
-                 'green': gdata,
-                 'blue':  bdata}
-
-    return mpl_data
+    return {'red': rdata, 'green': gdata, 'blue': bdata}
 
 
 mpl_data = RGBToPyCmap(turbo_colormap_data)

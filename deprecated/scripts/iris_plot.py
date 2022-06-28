@@ -18,7 +18,7 @@ from sklearn.datasets import load_iris
 iris = load_iris()
 
 # Extract numpy arrays
-X = iris.data 
+X = iris.data
 y = iris.target
 
 # Convert to pandas dataframe 
@@ -30,7 +30,7 @@ df['label'] = pd.Series(iris.target_names[y], dtype='category')
 #cmap = ListedColormap(['orange', 'green', 'purple']) 
 palette = {'setosa': 'orange', 'versicolor': 'green', 'virginica': 'purple'}
 
-g = sns.pairplot(df, vars = df.columns[0:4], hue="label", palette=palette)
+g = sns.pairplot(df, vars=df.columns[:4], hue="label", palette=palette)
 #g = sns.pairplot(df, vars = df.columns[0:4], hue="label")
 pml.savefig('iris_scatterplot_purple.pdf')
 plt.show()
@@ -40,7 +40,7 @@ plt.show()
 iris_df = df.copy()
 iris_df.columns =  ['sl', 'sw', 'pl', 'pw'] + ['label'] 
 
-g = sns.pairplot(iris_df, vars = iris_df.columns[0:4], hue="label")
+g = sns.pairplot(iris_df, vars=iris_df.columns[:4], hue="label")
 plt.tight_layout()
 pml.savefig('iris_pairplot.pdf')
 plt.show()

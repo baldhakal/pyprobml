@@ -51,9 +51,7 @@ def rbf_features(X, centers, sigma):
 # using matrix inversion for ridge regression
 def ridgeReg(X, y, lambd):  # returns weight vectors.
     D = X.shape[1]
-    w = np.linalg.inv(X.T @ X + lambd * np.eye(D, D)) @ X.T @ y
-
-    return w
+    return np.linalg.inv(X.T @ X + lambd * np.eye(D, D)) @ X.T @ y
 
 
 fig, ax = plt.subplots(3, 3, figsize=(10,10))

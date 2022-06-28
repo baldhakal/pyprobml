@@ -104,22 +104,21 @@ def plot_contours(xx, yy, x_range, y_range, u, sigma):
 def make_one_hot(yhat):
     yy = yhat.reshape(-1,1) # make 2d
     enc = OneHotEncoder(sparse=False)
-    Y  = enc.fit_transform(yy)
-    return Y
+    return enc.fit_transform(yy)
 
 for u, sigma in models:
     x, labels = make_data(u, sigma)
     xx, yy, x_range, y_range = make_grid(x)
     X = np.vstack(x)
     Y = np.hstack(labels)
-    
+
     plt.figure()
     plot_points(x)
     plt.axis('square')
     plt.tight_layout()
     save_fig('gda_2d_data.pdf')
     plt.show()
-        
+
     plt.figure()
     plot_points(x)
     plot_contours(xx, yy, x_range, y_range, u, sigma)
@@ -127,7 +126,7 @@ for u, sigma in models:
     plt.tight_layout()
     save_fig('gda_2d_contours.pdf')
     plt.show()
-    
+
     for k, clf in enumerate((LDA(), QDA())):
         clf.fit(X, Y)
         z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
@@ -135,7 +134,7 @@ for u, sigma in models:
         z_p = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])
         yhat = clf.predict(np.c_[xx.ravel(), yy.ravel()])
         Yhat = make_one_hot(yhat)
-        
+
         plt.figure()
         #plot_dboundaries(xx, yy, z, z_p)
         plot_dboundaries(xx, yy, z, Yhat)
@@ -144,7 +143,7 @@ for u, sigma in models:
         plt.title(model_names[k])
         plt.axis('square')
         plt.tight_layout()
-        save_fig('gda_2d_{}.pdf'.format(model_names[k]))
+        save_fig(f'gda_2d_{model_names[k]}.pdf')
         plt.show()
 
 

@@ -52,8 +52,7 @@ def flda_sklearn(X, Y):
 
 def Xproj_fish_sk_cal(w_sk):
     slope = w_sk[0, 1]/w_sk[0, 0]
-    Xproj_fish_sk = X.dot(w_sk.T) 
-    return Xproj_fish_sk
+    return X.dot(w_sk.T)
 
 """# b)"""
 
@@ -76,12 +75,7 @@ def flda_manual(a, b):
     mean2 = b.mean(0)
     mean_diff = np.atleast_1d(mean1 - mean2)
 
-    # The vector w, which when X is projected onto it best separates the data by class. 
-    # w = (mean1 - mean2) / (cov1 + cov2) [Formula in topic 9.2.6.1 in the book]
-
-    w = -np.linalg.pinv(cov_tot).dot(mean_diff)
-    
-    return w
+    return -np.linalg.pinv(cov_tot).dot(mean_diff)
 
 def Xproj_fish_man_cal(X, w):
     Xproj_fish = X.dot(w) 
@@ -107,9 +101,8 @@ def pca_sklearn(X, Y):
     return X_fit, X_tran
 
 def Xproj_pca_sk_cal(X_fit):
-  weights = X_fit.components_
-  Xproj_pca_sk = X.dot(weights.T)
-  return Xproj_pca_sk
+    weights = X_fit.components_
+    return X.dot(weights.T)
 
 """# b)"""
 
@@ -231,15 +224,15 @@ def plot_proj(name, argument):
         plt.hist(Xproj_pca_female, color='blue', ec='black')
         plt.title('Projection of points onto PCA vector')
         pml.savefig("fisher_lda_pca.pdf")
-        plt.show()
-    else :
+    else:
         Xproj_fish_male = argument[:nMale]
         Xproj_fish_female = argument[nMale:nFemale]
         plt.hist(Xproj_fish_male, color='red', ec='black')
         plt.hist(Xproj_fish_female, color='blue', ec='black')
         plt.title('Projection of points onto Fisher vector')
         pml.savefig("fisher_lda_flda.pdf")
-        plt.show()
+
+    plt.show()
 
 """Data"""
 

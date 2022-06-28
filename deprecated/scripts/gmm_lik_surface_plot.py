@@ -36,8 +36,8 @@ n_mu2_bins = mu2_bins.size
 
 lik_bins = np.zeros((n_mu1_bins, n_mu2_bins))
 
-for b1 in range(0, n_mu1_bins):
-    for b2 in range(0, n_mu2_bins):
+for b1 in range(n_mu1_bins):
+    for b2 in range(n_mu2_bins):
         p1 = true_pi * multivariate_normal.pdf(obs, mu1_bins[b1], true_sigma)
         p2 = (1-true_pi) * multivariate_normal.pdf(obs, mu1_bins[b2], true_sigma)
         lik_bins[b1, b2] = sum(np.log(p1 + p2));

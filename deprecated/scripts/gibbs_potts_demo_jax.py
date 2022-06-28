@@ -64,10 +64,8 @@ def state_mat_update(mask, inverse_mask, sample, state_mat):
   return state_mat
 
 def energy(state_mat, jvalue):
-  # Calculate energy
-  logits = lax.conv_general_dilated(state_mat, jvalue*kernel, 
-                                    (1,1), 'SAME', (1,1), (1,1), dn)  
-  return logits
+  return lax.conv_general_dilated(state_mat, jvalue * kernel, (1, 1), 'SAME',
+                                  (1, 1), (1, 1), dn)
 
 def gibbs_sampler(key, jvalue, niter=1):
   key, key2 = random.split(key)

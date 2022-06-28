@@ -58,13 +58,13 @@ def trunc(x0, T, lr0, beta):
     
 
 expts = {}
-for i, lr0 in enumerate(lrs):
+for lr0 in lrs:
     x_trace = gd(x0, T, lr0, beta)
     name = 'GD-{:0.3f}'.format(lr0)
     expts[name] = x_trace
-    
+
 plt.figure()
-for name in expts.keys():
+for name in expts:
     plt.plot(expts[name], label=name)
 plt.legend()
 save_fig('instability-gd.pdf')
@@ -72,13 +72,13 @@ plt.show()
 
 
 expts = {}
-for i, lr0 in enumerate(lrs):
+for lr0 in lrs:
     x_trace = prox(x0, T, lr0, beta)
     name = 'prox-{:0.3f}'.format(lr0)
     expts[name] = x_trace
-    
+
 plt.figure()
-for name in expts.keys():
+for name in expts:
     plt.plot(expts[name], label=name)
 plt.legend()
 save_fig('instability-prox.pdf')
@@ -86,13 +86,13 @@ plt.show()
 
 
 expts = {}
-for i, lr0 in enumerate(lrs):
+for lr0 in lrs:
     x_trace = trunc(x0, T, lr0, beta)
     name = 'trunc-{:0.3f}'.format(lr0)
     expts[name] = x_trace
-    
+
 plt.figure()
-for name in expts.keys():
+for name in expts:
     plt.plot(expts[name], label=name)
 plt.legend()
 save_fig('instability-trunc.pdf')

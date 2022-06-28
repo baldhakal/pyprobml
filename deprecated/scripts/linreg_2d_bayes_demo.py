@@ -136,14 +136,14 @@ for di in DataIndices:
         Post = MeanCovPost(x[:di],y[:di])
         postM = Post['Mean']
         postCov = Post['Cov']
-        
+
         #Left graph
         figcounter += 1
         fig.add_subplot(len(DataIndices),3,figcounter)
         likfunc = LikeFMaker(x[di-1],y[di-1])
         plt.contourf(G1, G2, likfunc(G1,G2), 100)
         adjustgraph(True)
-    
+
     #Middle graph
     postfunc = GaussPdfMaker(postM,postCov)
     figcounter += 1
@@ -153,7 +153,7 @@ for di in DataIndices:
     #Set title if this is the top middle graph
     if figcounter == 2:
         ax.set_title('prior/posterior')
-    
+
     #Right graph    
     Samples = multivariate_normal(postM,postCov).rvs(NSamples)
     Lines = Xg.dot(Samples.T)

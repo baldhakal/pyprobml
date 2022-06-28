@@ -16,8 +16,10 @@ def ridge(X, y, lam):
     """
     This function can be completed pinv as well
     """
-    W = np.dot(linalg.pinv((np.dot(X.T, X) + np.sqrt(lam) * np.eye(X.shape[0]))), np.dot(X.T, y))
-    return W
+    return np.dot(
+        linalg.pinv((np.dot(X.T, X) + np.sqrt(lam) * np.eye(X.shape[0]))),
+        np.dot(X.T, y),
+    )
 
 
 def basisExpansion(X, s=None, centers=[]):
@@ -74,10 +76,10 @@ for lam in range(len(lambdas)):
     ax[lam, 0].plot(domain[..., np.newaxis].repeat(20, axis=1), yhat[:, :showNsets], color='#ff7f00')
     ax[lam, 0].set_xlim([-0.1, 1.1])
     ax[lam, 0].set_ylim([-1.5, 1.5])
-    ax[lam, 0].set_title('ln($\lambda$) = {}'.format(np.log(lambdas[lam])))
+    ax[lam, 0].set_title(f'ln($\lambda$) = {np.log(lambdas[lam])}')
 
     ax[lam, 1].plot(domain, fun(domain), lineWidth=2.5)
     ax[lam, 1].plot(domain, np.mean(yhat, axis=1), linestyle=':', lineWidth=2.5)
-    ax[lam, 1].set_title('ln($\lambda$) = {}'.format(np.log(lambdas[lam])))
+    ax[lam, 1].set_title(f'ln($\lambda$) = {np.log(lambdas[lam])}')
 
 fig.savefig('../figures/biasVarModelComplexityV3.png')

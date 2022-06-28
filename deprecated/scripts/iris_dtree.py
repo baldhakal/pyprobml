@@ -72,31 +72,31 @@ def plot_surface(clf, X, y, filename, xnames, ynames):
     n_classes = 3
     plot_step = 0.02
     markers = [ 'o', 's', '^']
-    
+
     plt.figure()
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, plot_step),
                          np.arange(y_min, y_max, plot_step))
     plt.tight_layout(h_pad=0.5, w_pad=0.5, pad=2.5)
-    
+
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
-    
+
     #cmap=plt.cm.jet
     #cmap=plt.cm.RdYlBu      
     #cmap = ListedColormap(['orange', 'green', 'purple']) 
     cmap = ListedColormap(['blue', 'orange', 'green'])
-     
+
     cs = plt.contourf(xx, yy, Z, cmap=cmap, alpha=0.5)
-    
+
     #plot_colors = "ryb"
     #plot_colors = "byg"
     plot_colors = [cmap(i) for i in range(3)]
-    
+
     plt.xlabel(xnames[0])
     plt.ylabel(xnames[1])
-    
+
     # Plot the training points
     for i, color, marker in zip(range(n_classes), plot_colors, markers):
         idx = np.where(y == i)
@@ -116,16 +116,16 @@ def demo():
     y = iris.target
     xnames= [iris.feature_names[i] for i in ndx]
     ynames = iris.target_names
-    
+
     depths = [2, 20]
     for depth in depths:
         clf = tree.DecisionTreeClassifier(random_state=42, max_depth=depth)
         clf = clf.fit(X, y)
-        
-        fname = os.path.join(figdir, 'iris-dtree-2d-tree-depth{}.pdf'.format(depth))
+
+        fname = os.path.join(figdir, f'iris-dtree-2d-tree-depth{depth}.pdf')
         #plot_tree(clf, fname, xnames, ynames)
-        
-        fname  = os.path.join(figdir, 'iris-dtree-2d-surface-depth{}.pdf'.format(depth))
+
+        fname = os.path.join(figdir, f'iris-dtree-2d-surface-depth{depth}.pdf')
         plot_surface(clf, X, y, fname, xnames, ynames)
 
 demo()

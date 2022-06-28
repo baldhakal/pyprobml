@@ -60,15 +60,16 @@ fopt = funObj(wOpt)
 # fopt,_ ,_ = LinregLossScaled(wTrue, X, y)
 
 #Options for stochastic gradient descent
-opts = {}
-opts['batchsize'] = 1
-opts['verbose'] = True
-opts['storeParamTrace'] = True
-opts['storeFvalTrace'] = True
-opts['storeStepTrace'] = True
-opts['maxUpdates'] = 30
-opts['eta0'] = 0.5
-opts['t0'] = 3
+opts = {
+    'batchsize': 1,
+    'verbose': True,
+    'storeParamTrace': True,
+    'storeFvalTrace': True,
+    'storeStepTrace': True,
+    'maxUpdates': 30,
+    'eta0': 0.5,
+    't0': 3,
+}
 
 #Breaks the matrix X and vector y into batches
 def batchify(X, y, batchsize):
@@ -115,11 +116,7 @@ def stochgradSimple(objFun, w0, X, y, *args, **kwargs):
         print('%d batches of size %d\n' %(num_batches, batchsize))
 
     w = w0
-    trace = {}
-    trace['fvalMinibatch'] = []
-    trace['params'] = []
-    trace['stepSize'] = []
-
+    trace = {'fvalMinibatch': [], 'params': [], 'stepSize': []}
     # Main loop:
     nupdates = 1
     for epoch in range(1, maxepoch+1):
@@ -161,33 +158,27 @@ def stochgradTracePostprocess(objFun, trace, X, y, *args):
 print(w)
 whist = np.asarray(trace['params'])
 
-#Parameter trajectory
-if True:
-    fig, ax = plt.subplots()
-    ax.set_title('LMS trajectory')
-    CS = plt.contour(W0, W1, SS)
-    plt.plot(wOpt[0], wOpt[1], 'x', color='r', ms=10, mew=5)
-    plt.plot(whist[:, 0], whist[:, 1], 'ko-', lw=2)
-    pml.savefig('lmsTraj.pdf')
-    plt.draw()
+fig, ax = plt.subplots()
+ax.set_title('LMS trajectory')
+CS = plt.contour(W0, W1, SS)
+plt.plot(wOpt[0], wOpt[1], 'x', color='r', ms=10, mew=5)
+plt.plot(whist[:, 0], whist[:, 1], 'ko-', lw=2)
+pml.savefig('lmsTraj.pdf')
+plt.draw()
 
-#Loss values over the parameter path compared to the optimal loss.    
-if True:
-    fvalhist = np.asarray(stochgradTracePostprocess(LinregLossScaled, trace['params'], X, y))
-    fig, ax = plt.subplots()
-    ax.set_title('RSS vs iteration')
-    plt.plot(fvalhist,'ko-', lw=2)
-    plt.axhline(fopt)
-    pml.savefig('lmsRssHist.pdf')
-    plt.draw()
+fvalhist = np.asarray(stochgradTracePostprocess(LinregLossScaled, trace['params'], X, y))
+fig, ax = plt.subplots()
+ax.set_title('RSS vs iteration')
+plt.plot(fvalhist,'ko-', lw=2)
+plt.axhline(fopt)
+pml.savefig('lmsRssHist.pdf')
+plt.draw()
 
-#Stepsize graph if desired:
-if True:
-    stephist = np.asarray(trace['stepSize'])
-    fig, ax = plt.subplots()
-    ax.set_title('Stepsize vs iteration')
-    plt.plot(stephist,'ko-', lw=2)
-    pml.savefig('lmsStepSizeHist.pdf')
-    plt.draw()
+stephist = np.asarray(trace['stepSize'])
+fig, ax = plt.subplots()
+ax.set_title('Stepsize vs iteration')
+plt.plot(stephist,'ko-', lw=2)
+pml.savefig('lmsStepSizeHist.pdf')
+plt.draw()
 
 plt.show()

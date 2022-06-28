@@ -61,7 +61,7 @@ for i in range(cov_size):
 unit_test = np.ones((test_num,cov_size))/cov_size
 K_test = np.zeros((test_num,cov_size))
 K_test = np.exp(-cdist(test_patterns, patterns)**2/rbf_var)
-  
+
 K_test_n = K_test - unit_test @ K - K_test @ unit + unit_test @ K @ unit
 test_features = np.zeros((test_num, max_ev))                                                             
 test_features = K_test_n @ evecs[:,0:max_ev]

@@ -67,19 +67,32 @@ class DCGANGenerator(nn.Module):
         last_block: bool = False,
         use_relu: bool = False
     ) -> nn.Sequential:
-        if not last_block:
-            gen_block = nn.Sequential(
-                nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias),
+        return (
+            nn.Sequential(
+                nn.ConvTranspose2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size,
+                    stride,
+                    padding,
+                    bias=bias,
+                ),
+                nn.Sigmoid(),
+            )
+            if last_block
+            else nn.Sequential(
+                nn.ConvTranspose2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size,
+                    stride,
+                    padding,
+                    bias=bias,
+                ),
                 nn.BatchNorm2d(out_channels),
                 nn.Relu() if use_relu else nn.Mish(),
             )
-        else:
-            gen_block = nn.Sequential(
-                nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias),
-                nn.Sigmoid(),
-            )
-
-        return gen_block
+        )
 
     def forward(self, noise: Tensor) -> Tensor:
         return self.gen(noise)
@@ -113,19 +126,32 @@ class DCGANDiscriminator(nn.Module):
         batch_norm: bool = True,
         last_block: bool = False,
     ) -> nn.Sequential:
-        if not last_block:
-            disc_block = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias),
+        return (
+            nn.Sequential(
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size,
+                    stride,
+                    padding,
+                    bias=bias,
+                ),
+                nn.Sigmoid(),
+            )
+            if last_block
+            else nn.Sequential(
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size,
+                    stride,
+                    padding,
+                    bias=bias,
+                ),
                 nn.BatchNorm2d(out_channels) if batch_norm else nn.Identity(),
                 nn.LeakyReLU(0.2, inplace=True),
             )
-        else:
-            disc_block = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias),
-                nn.Sigmoid(),
-            )
-
-        return disc_block
+        )
 
     def forward(self, x: Tensor) -> Tensor:
         return self.disc(x).view(-1, 1).squeeze(1)
@@ -247,27 +273,21 @@ class DCGAN(LightningModule):
         fake_gt = smooth*torch.rand_like(fake_pred)
         fake_loss = self.criterion(fake_pred, fake_gt)
 
-        disc_loss = real_loss + fake_loss
-
-        return disc_loss
+        return real_loss + fake_loss
 
     def _get_gen_loss(self, real: Tensor) -> Tensor:
         # Train with fake
         fake_pred = self._get_fake_pred(real)
         topk_predictions = torch.topk( fake_pred , self.topk )[0]
         fake_gt = torch.ones_like(topk_predictions)
-        gen_loss = self.criterion(topk_predictions, fake_gt)
-
-        return gen_loss
+        return self.criterion(topk_predictions, fake_gt)
 
     def _get_fake_pred(self, real: Tensor) -> Tensor:
         batch_size = len(real)
         noise = self._get_noise(batch_size, self.hparams.latent_dim)
-        fake = self(noise) 
+        fake = self(noise)
         fake = fake + self.noise_factor*torch.rand_like(real)
-        fake_pred = self.discriminator(fake)
-
-        return fake_pred
+        return self.discriminator(fake)
 
     def _get_noise(self, n_samples: int, latent_dim: int) -> Tensor:
         return torch.randn(n_samples, latent_dim, device=self.device)
@@ -315,14 +335,14 @@ if __name__ == "__main__":
     parser.add_argument('--image-size', type=int, default=64, help="Image size")
     parser.add_argument('--crop-size', type=int, default=128, help="Crop size")
     parser.add_argument('--bs', type=int, default=144, help="batch size")
-    parser.add_argument('--data-path', type=str, default="kaggle", help="batch size") 
-    parser.add_argument('--gpus', type=int, default=1, help="gpu use") 
-    parser.add_argument('--epochs', type=int, default=50, help="Num of epochs") 
+    parser.add_argument('--data-path', type=str, default="kaggle", help="batch size")
+    parser.add_argument('--gpus', type=int, default=1, help="gpu use")
+    parser.add_argument('--epochs', type=int, default=50, help="Num of epochs")
     parser = DCGAN.add_model_specific_args(parser)
 
     # Hyperparameters
     hparams = parser.parse_args()
-    
+
     SEED = hparams.seed
     torch.manual_seed(SEED)
     np.random.seed(SEED)
@@ -334,8 +354,7 @@ if __name__ == "__main__":
     CROP = hparams.crop_size
     DATA_PATH = hparams.data_path
 
-    trans = []
-    trans.append(transforms.RandomHorizontalFlip())
+    trans = [transforms.RandomHorizontalFlip()]
     if CROP > 0:
         trans.append(transforms.CenterCrop(CROP))
     trans.append(transforms.Resize(IMAGE_SIZE))

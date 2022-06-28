@@ -19,7 +19,7 @@ x_train = X[:ntrain]
 y_train = y[:ntrain]
 x_test = X[ntrain:]
 y_test = y[ntrain:]
-                  
+
 
 
 plt.figure()
@@ -63,8 +63,8 @@ for k in [1, 2, 5]:
                  x_train[y_train == y_unique[i], 1],
                  marker=markers[i],
                  c=colors[i])
-  plt.title('k=%s' % (k))
-  pml.savefig('knnClassify{}.pdf'.format(k))
+  plt.title(f'k={k}')
+  pml.savefig(f'knnClassify{k}.pdf')
   plt.show()
 
 #plot train err and test err with different k
@@ -106,9 +106,9 @@ knn.fit(x_train, y_train)
 xy_predic = knn.predict_proba(xy)
 levels = np.arange(0, 1.01, 0.1)
 for i in range(3):
-    plt.figure()
-    plt.contourf(xy_predic[:, i].ravel().reshape(200, 200), levels)
-    plt.colorbar()
-    plt.title('p(y=%s | data, k=10)' % (i))
-    pml.savefig('knnClassifyDemo_hotmap_%s.png' % (i))
+  plt.figure()
+  plt.contourf(xy_predic[:, i].ravel().reshape(200, 200), levels)
+  plt.colorbar()
+  plt.title(f'p(y={i} | data, k=10)')
+  pml.savefig(f'knnClassifyDemo_hotmap_{i}.png')
 plt.show()

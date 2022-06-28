@@ -11,8 +11,7 @@ def range_chebyshev(a, b, steps):
     Create a grid point of N+1 values
     """
     theta_vals = np.arange(steps+1) * np.pi / steps
-    x_vals = (a + b) / 2 + (a - b) / 2 * np.cos(theta_vals)
-    return x_vals
+    return (a + b) / 2 + (a - b) / 2 * np.cos(theta_vals)
 
 def plot_ellipses(x0, y0, a, b, r, lim=5, steps=50000, **kwargs):
     """

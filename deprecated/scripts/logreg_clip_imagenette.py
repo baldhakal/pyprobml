@@ -67,8 +67,7 @@ class Lit_model(pl.LightningModule):
         return self.network(x)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
-        return optimizer
+        return torch.optim.Adam(self.parameters(), lr=1e-3)
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch

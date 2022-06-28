@@ -14,7 +14,7 @@ import arviz as az
 import pyprobml_utils as pml
 import os
 
-    
+
 np.random.seed(1)
 N = 100
 alpha_real = 2.5

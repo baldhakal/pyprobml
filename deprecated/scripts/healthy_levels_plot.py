@@ -17,7 +17,7 @@ def generate_data():
     # Healthy levels we are trying to discover
     c_low = 0.35; c_high = 0.55;
     i_low = 0.45; i_high = 0.65;
-        
+
     # Cheat and use interesting-looking data.
     c =  [0.351, 0.363, 0.40, 0.54, 0.45, 0.49, 0.48, 0.50, 0.45, 0.41, 0.53, 0.54]
     i =  [0.452, 0.64, 0.46, 0.55, 0.55, 0.50, 0.49, 0.61, 0.58, 0.46, 0.53, 0.64]
@@ -73,8 +73,8 @@ def calc_posterior(likelihood, prior):
 # Plot maximum likelihood based predictions for the top 3 and 12 data points.
 def plot_ml(data):
     top_n = [3, 12];
-    for i in range(len(top_n)):
-        n = top_n[i]
+    for item in top_n:
+        n = item
         figure = plt.figure()
         plot_data = data[:n]
         # Plot the data and the smallest rectangle enclosing it.
@@ -85,27 +85,27 @@ def plot_ml(data):
                               edgecolor='black', linewidth=3)
                 )
         plt.scatter(plot_data[:,0], plot_data[:,1], marker='+', color='red', zorder=10, linewidth=3)
-        plt.title('MLE predictive, n={}'.format(n), fontsize=12, y=1.03)
+        plt.title(f'MLE predictive, n={n}', fontsize=12, y=1.03)
         plt.axis('square')
         plt.ylim(0, 1)
         plt.xlim(0, 1)
-        
-        filename = '../figures/healthyLevelsMLPred{}.pdf'.format(n)
+
+        filename = f'../figures/healthyLevelsMLPred{n}.pdf'
         plt.savefig(filename)
         plt.show(block=False)
 
 def plot_posterior_samples(data, hypotheses, prior):
     top_n = [3, 12]
-    for i in range(len(top_n)):
-        plot_data = data[:top_n[i]]
+    prior_type = 'uninfPrior'
+    for item in top_n:
+        plot_data = data[:item]
         plot_lik = calc_likelihood(hypotheses, plot_data)
         plot_post = calc_posterior(plot_lik, prior)
-        
+
         figure = plt.figure()
-        prior_type = 'uninfPrior'
-        title = r'samples from $p(h|D_{{1:{}}})$, {}'.format(top_n[i], prior_type)
+        title = r'samples from $p(h|D_{{1:{}}})$, {}'.format(item, prior_type)
         plot_sampled_hypotheses(hypotheses, plot_post, plot_data, title)
-        filename = '../figures/healthyLevelsSamples{}{}.pdf'.format(top_n[i], prior_type)
+        filename = f'../figures/healthyLevelsSamples{item}{prior_type}.pdf'
         plt.title(title, fontsize=12, y=1.03)
         plt.savefig(filename)
         plt.show(block=False)
@@ -164,28 +164,28 @@ def plot_contour(data, is_last_plot):
     y = x
     xx, yy = np.meshgrid(x, y)
     points = np.column_stack([xx.reshape(-1, 1), yy.reshape(-1, 1)])
-        
+
     # Predictive distribution: Tenenbaum thesis eqn 3.16.
     d1, d2, r1, r2 = neighbour(data, points)
     denom = (1 + (d1/r1)) * (1 + (d2/r2))
     p = np.power(1/denom, n-1)
     p = p / np.sum(p)
-    
+
     # Prepare for plotting
     pp = p.reshape(xx.shape)
-    
+
     # Plot the predictive contours and data
     figure = plt.figure()
     plt.gray()
     plt.contour(xx, yy, pp)
     plt.scatter(data[:,0], data[:,1], marker='+', color='red', zorder=10, linewidth=3)
-    
-    plt.title('Bayes predictive, n={}, uninfPrior'.format(n), fontsize=12, y=1.03)
+
+    plt.title(f'Bayes predictive, n={n}, uninfPrior', fontsize=12, y=1.03)
     plt.axis('square')
     plt.ylim(0, 1)
     plt.xlim(0, 1)
 
-    filename = '../figures/healthyLevelsBayesPred{}UninfPrior.pdf'.format(n)
+    filename = f'../figures/healthyLevelsBayesPred{n}UninfPrior.pdf'
     plt.savefig(filename)
     plt.show(block=is_last_plot)
     

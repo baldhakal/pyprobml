@@ -79,10 +79,10 @@ for (name, clf) in classifiers.items():
         clf.fit(X_rbf, y)
         Z = clf.predict_proba(rbf_feature.fit_transform(np.c_[xx.ravel(), yy.ravel()]))
         Z = Z[:, 0].reshape(xx.shape)
-        plt.title(name + ", nerr= {}".format(np.sum(y != clf.predict(X_rbf))))
+        plt.title(name + f", nerr= {np.sum(y != clf.predict(X_rbf))}")
         plt.contour(xx, yy, Z, levels)
         plot_scatters(X, y)
-        pml.savefig("kernelBinaryClassifDemo{}.pdf".format(name),  dpi=300)
+        pml.savefig(f"kernelBinaryClassifDemo{name}.pdf", dpi=300)
         plt.show()
     elif name == 'logregL1':
         clf.fit(X_rbf, y)
@@ -96,7 +96,7 @@ for (name, clf) in classifiers.items():
         nerr = np.sum(y != clf.predict(X_rbf))
         plot_SVs(SV)
         plt.title(f"{name}, nerr={nerr}, nsupport={nsupport}")
-        pml.savefig("kernelBinaryClassifDemo{}.pdf".format(name),  dpi=300)
+        pml.savefig(f"kernelBinaryClassifDemo{name}.pdf", dpi=300)
         plt.show()
     elif name == 'RVM':
         clf.fit(X, y)
@@ -109,7 +109,7 @@ for (name, clf) in classifiers.items():
         nsupport = SV.shape[0]
         nerr = np.sum(y != clf.predict(X))
         plt.title(f"{name}, nerr={nerr}, nsupport={nsupport}")
-        pml.savefig("kernelBinaryClassifDemo{}.pdf".format(name),  dpi=300)
+        pml.savefig(f"kernelBinaryClassifDemo{name}.pdf", dpi=300)
         plt.show()
     elif name == 'SVM':
         clf.fit(X, y)
@@ -123,5 +123,5 @@ for (name, clf) in classifiers.items():
         nsupport = SV.shape[0]
         nerr = np.sum(y != clf.predict(X))
         plt.title(f"{name}, nerr={nerr}, nsupport={nsupport}")
-        pml.savefig("kernelBinaryClassifDemo{}.pdf".format(name),  dpi=300)
+        pml.savefig(f"kernelBinaryClassifDemo{name}.pdf", dpi=300)
         plt.show()

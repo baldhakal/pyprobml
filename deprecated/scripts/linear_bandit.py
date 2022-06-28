@@ -37,10 +37,7 @@ class LinearBandit:
             raise NotImplemented
 
     def _get_epsilon(self):
-        if callable(self._epsilon):
-            return self._epsilon()
-        else:
-            return self._epsilon
+        return self._epsilon() if callable(self._epsilon) else self._epsilon
 
     def init_bel(self, contexts, actions, rewards):
         mu = jnp.zeros((self.num_arms, self.num_features))
@@ -95,15 +92,14 @@ class LinearBandit:
         sigma2_samp = tfd.InverseGamma(
             concentration=a, scale=b).sample(seed=sigma_key)
         covariance_matrix = sigma2_samp[:, None, None] * Sigma
-        w = tfd.MultivariateNormalFullCovariance(
-            loc=mu, covariance_matrix=covariance_matrix).sample(seed=w_key)
-        return w
+        return tfd.MultivariateNormalFullCovariance(
+            loc=mu, covariance_matrix=covariance_matrix
+        ).sample(seed=w_key)
 
     def thompson_sampling_policy(self, key, bel, context):
         w = self._sample_params(key, bel)
         predicted_reward = jnp.einsum("m,km->k", context, w)
-        action = predicted_reward.argmax()
-        return action
+        return predicted_reward.argmax()
 
     def ucb_policy(self, key, bel, context):
         mu, Sigma, a, b = bel

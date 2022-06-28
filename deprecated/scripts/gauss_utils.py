@@ -67,7 +67,7 @@ def gauss_fit_em(X, max_iter=50, eps=1e-04):
     C = np.isnan(X) == False  # Identifying nan locations
     e = 0.0000001
     one_to_nc = np.arange(1, nc + 1, step=1)
-    M = one_to_nc * (C == False) - 1  # Missing locations (-1 at locations where Nan is present in X)
+    M = one_to_nc * (not C) - 1
     O = one_to_nc * C - 1  # Observed locations (-1 at locations where Nan is not present in X)
 
     # Generate initial Mu and Sigma

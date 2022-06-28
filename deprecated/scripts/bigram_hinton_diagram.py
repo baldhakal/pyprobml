@@ -18,7 +18,7 @@ raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split() for st in lines]
 # Print first few lines
 for sentence in raw_dataset[:10]:
     print(sentence)
-    
+
 # Concat sentences into single string of chars
 #  skip blank lines
 sentences = [' '.join(s) for s in raw_dataset if s]
@@ -32,11 +32,11 @@ wseq = charseq
 print('First 10 unigrams\n', wseq[:10])
 
 # Bigrams
-word_pairs = [pair for pair in zip(wseq[:-1], wseq[1:])]
+word_pairs = list(zip(wseq[:-1], wseq[1:]))
 print('First 10 bigrams\n', word_pairs[:10])
 
 # Trigrams
-word_triples = [triple for triple in zip(wseq[:-2], wseq[1:-1], wseq[2:])]
+word_triples = list(zip(wseq[:-2], wseq[1:-1], wseq[2:]))
 print('First 10 trigrams\n', word_triples[:10])
 
 # ngram statistics
@@ -51,13 +51,7 @@ print('Most common trigrams\n', counter_triples.most_common(10))
 
 # convert [(('t', 'h', 'e'), 3126), ...] to {'the': 3126, ...}
 def make_dict(lst, min_count=1):
-    d = dict()
-    for s, c in lst:
-        if c <= min_count:
-            continue
-        key = ''.join(s)
-        d[key] = c
-    return d
+    return {''.join(s): c for s, c in lst if c > min_count}
 
 unigram_dict = make_dict(counter.most_common())
 alphabet = list(unigram_dict.keys())

@@ -36,8 +36,7 @@ class AE(nn.Module):
 
   def encode(self, x):
     x = self.encoder(x)
-    mu = self.fc_mu(x)
-    return mu
+    return self.fc_mu(x)
 
 class BasicAEModule(LightningModule):
 

@@ -77,7 +77,7 @@ for i in range(ngrid):
         params = np.asmatrix([grid_w[i,j], grid_b[i,j]])
         p = predict_prob(X1, params)
         loss_grid[i,j] = loss(p, y)
-        
+
 
 # Plot the loss function surface
 plt.figure()

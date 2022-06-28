@@ -32,7 +32,7 @@ df = df_iris.query("species == ('setosa', 'versicolor')")
 y_0 = pd.Categorical(df['species']).codes
 x_n = 'sepal_length' 
 x_0 = df[x_n].values
-    
+
 # Create outliers
 x_outliers = np.array([4.2, 4.5, 4.0, 4.3, 4.2, 4.4])
 y_outliers = np.ones_like(x_outliers, dtype=int)
@@ -52,10 +52,10 @@ x_c = x_0 - xmean
 
 def plot_training_data():
     plt.figure()
+    sigma = 0.02 # for vertical jittering
     for c in [0,1]:
         ndx_c = np.where(y_0==c)[0]
         color = f'C{c}'
-        sigma = 0.02 # for vertical jittering
         inliers = np.intersect1d(ndx_c, inlier_ndx)
         plt.scatter(x_c[inliers], 
                     np.random.normal(y_0[inliers], sigma),
@@ -64,7 +64,7 @@ def plot_training_data():
         plt.scatter(x_c[outliers], 
                     np.random.normal(y_0[outliers], sigma),
                     marker='x', color=color)
-         
+
     plt.xlabel(x_n)
     plt.ylabel('p(y=1)', rotation=0)
     # use original scale for xticks

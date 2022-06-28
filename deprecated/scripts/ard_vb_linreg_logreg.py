@@ -247,23 +247,22 @@ class VBRegressionARD(LinearModel,RegressorMixin):
         Sigma: covariance matrix
         '''
         # compute precision parameter
-        S    = exp_tau*XX       
+        S    = exp_tau*XX
         np.fill_diagonal(S, np.diag(S) + exp_A)
-        
+
         # cholesky decomposition
         R    = np.linalg.cholesky(S)
-        
+
         # find mean of posterior distribution
         RtMw = solve_triangular(R, exp_tau*XY, lower = True, check_finite = False)
         Mw   = solve_triangular(R.T, RtMw, lower = False, check_finite = False)
-        
+
         # use cholesky decomposition of S to find inverse ( or diagonal of inverse)
         Ri    = solve_triangular(R, np.eye(R.shape[1]), lower = True, check_finite = False)
-        if full_covar:
-            Sigma = np.dot(Ri.T,Ri)
-            return [Mw,Sigma]
-        else:
+        if not full_covar:
             return [Mw,Ri]
+        Sigma = np.dot(Ri.T,Ri)
+        return [Mw,Sigma]
 
 
 #----------------------   Classification   ---------------------------------------------
@@ -359,13 +358,13 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
         check_classification_targets(y)
         self.classes_ = np.unique(y)
         n_classes = len(self.classes_)
-        
+
         # take into account bias term if required 
         n_samples, n_features = X.shape
         n_features = n_features + int(self.fit_intercept)
         if self.fit_intercept:
             X = np.hstack( (np.ones([n_samples,1]),X))
-        
+
         # handle multiclass problems using One-vs-Rest 
         if n_classes < 2:
             raise ValueError("Need samples of at least 2 classes")
@@ -376,16 +375,13 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
         else:
             self.coef_, self.sigma_, self.intercept_ = [0],[0],[0]
             self.active_ = [0]
-        
+
         # hyperparameters of precision for weights
         a  = self.a + 0.5 * np.ones(n_features)
         b  = self.b * np.ones(n_features)
-        
+
         for i in range(len(self.coef_)):
-            if n_classes == 2:
-                pos_class = self.classes_[1]
-            else:
-                pos_class   = self.classes_[i]
+            pos_class = self.classes_[1] if n_classes == 2 else self.classes_[i]
             mask            = (y == pos_class)
             y_bin           = np.ones(y.shape)
             y_bin[~mask]    = 0
@@ -394,7 +390,7 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
             self.intercept_[i] = intercept_
             self.sigma_[i]     = sigma_
             self.active_[i]    = active_
-            
+
         self.coef_  = np.asarray(self.coef_)
         return self
         
@@ -436,7 +432,7 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
         w       = np.copy(w0)
         active  = np.ones(X.shape[1], dtype = np.bool)
         XY      = np.dot(X.T, y - 0.5)
-        
+
         for i in range(self.n_iter):
             # In the E-step we update approximation of 
             # posterior distribution q(w,alpha) = q(w)*q(alpha)
@@ -446,30 +442,29 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
             Xa      = X[:,active]
             XYa     = XY[active]   #np.dot(Xa.T,(y-0.5))
             w[active],Ri = u,v   = self._posterior_dist(Xa,l,a[active],b[active],XYa)
-        
+
             # -------- update q(alpha) ---------------
             b[active] = self.b + 0.5*(w[active]**2 + np.sum(Ri**2,1))
-            
+
             # -------- update eps  ------------
             # In the M-step we update parameter eps which controls 
             # accuracy of local variational approximation to lower bound
             XMX = np.dot(Xa,w[active])**2
             XSX = np.sum( np.dot(Xa,Ri.T)**2, axis = 1)
             eps = np.sqrt( XMX + XSX )
-            
+
             # determine relevant vector as is described in Bishop & Tipping 
             # (i.e. using mean of posterior distribution)
             active  = np.abs(w) > self.prune_thresh
-            
+
             # do not prune intercept & make sure there is at least one 'relevant feature'.
             # If only one relevant feature , then choose rv with largest posterior mean
             if self.fit_intercept:
                 active[0] = True
                 if np.sum(active[1:]) == 0:
                     active[np.argmax(np.abs(w[1:]))] = True
-            else:
-                if np.sum(active) == 0:
-                    active[np.argmax(np.abs(w))] = True
+            elif np.sum(active) == 0:
+                active[np.argmax(np.abs(w))] = True
             # all irrelevant features are forced to zero
             w[~active] = 0
             # check convergence
@@ -482,12 +477,12 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
                    warnings.warn(("Only one relevant feature found! it can be useful to decrease"
                                   "value for parameter prune_thresh"))
                 break
-            
+
         l   = lam(eps)
         Xa  = X[:,active]
-        XYa = np.dot(Xa.T,(y-0.5)) 
+        XYa = np.dot(Xa.T,(y-0.5))
         w[active] , sigma_  = self._posterior_dist(Xa,l,a[active],b[active],XYa,True)
-        
+
         # separate intercept & coefficients
         intercept_ = 0
         if self.fit_intercept:
@@ -511,10 +506,9 @@ class VBClassificationARD(LinearClassifierMixin, BaseEstimator):
         Z     = solve_triangular(R,XY, lower = True)
         mean_ = solve_triangular(R.T,Z,lower = False)
         Ri    = solve_triangular(R,np.eye(X.shape[1]), lower = True)
-        if full_covar:
-            sigma_   = np.dot(Ri.T,Ri)
-            return mean_ , sigma_
-        else:
+        if not full_covar:
             return mean_ , Ri
+        sigma_   = np.dot(Ri.T,Ri)
+        return mean_ , sigma_
 
 

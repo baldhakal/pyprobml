@@ -17,6 +17,7 @@ rm kaggle.json
 to copy kaggle.json into a folder first 
 """
 
+
 import superimport
 
 import torch
@@ -32,8 +33,7 @@ BATCH_SIZE = 256
 CROP = 128
 DATA_PATH = "kaggle"
 
-trans = []
-trans.append(transforms.RandomHorizontalFlip())
+trans = [transforms.RandomHorizontalFlip()]
 if CROP > 0:
   trans.append(transforms.CenterCrop(CROP))
 trans.append(transforms.Resize(IMAGE_SIZE))
@@ -59,7 +59,7 @@ class AE(LightningModule):
         lr: float = 1e-4,
         **kwargs
     ):
-        """
+      """
         Args:
             input_height: height of the images
             enc_type: option between resnet18 or resnet50
@@ -73,85 +73,84 @@ class AE(LightningModule):
             lr: learning rate for Adam
         """
 
-        super(AE, self).__init__()
+      super(AE, self).__init__()
 
-        self.save_hyperparameters()
+      self.save_hyperparameters()
 
-        self.lr = lr
-        self.kl_coeff = kl_coeff
-        self.enc_out_dim = enc_out_dim
-        self.latent_dim = latent_dim
-        self.input_height = input_height
+      self.lr = lr
+      self.kl_coeff = kl_coeff
+      self.enc_out_dim = enc_out_dim
+      self.latent_dim = latent_dim
+      self.input_height = input_height
 
-        modules = []
-        if hidden_dims is None:
-            hidden_dims = [32, 64, 128, 256, 512]
+      modules = []
+      if hidden_dims is None:
+          hidden_dims = [32, 64, 128, 256, 512]
 
-        # Build Encoder
-        for h_dim in hidden_dims:
-            modules.append(
-                nn.Sequential(
-                    nn.Conv2d(in_channels, out_channels=h_dim,
-                              kernel_size= 3, stride= 2, padding  = 1),
-                    nn.BatchNorm2d(h_dim),
-                    nn.LeakyReLU())
-            )
-            in_channels = h_dim
+      # Build Encoder
+      for h_dim in hidden_dims:
+          modules.append(
+              nn.Sequential(
+                  nn.Conv2d(in_channels, out_channels=h_dim,
+                            kernel_size= 3, stride= 2, padding  = 1),
+                  nn.BatchNorm2d(h_dim),
+                  nn.LeakyReLU())
+          )
+          in_channels = h_dim
 
-        self.encoder = nn.Sequential(*modules)
-        self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)
-        self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)
+      self.encoder = nn.Sequential(*modules)
+      self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)
+      self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)
 
-        # Build Decoder
-        modules = []
+      # Build Decoder
+      modules = []
 
-        self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
+      self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
 
-        hidden_dims.reverse()
+      hidden_dims.reverse()
 
-        for i in range(len(hidden_dims) - 1):
-            modules.append(
-                nn.Sequential(
-                    nn.ConvTranspose2d(hidden_dims[i],
-                                       hidden_dims[i + 1],
-                                       kernel_size=3,
-                                       stride = 2,
-                                       padding=1,
-                                       output_padding=1),
-                    nn.BatchNorm2d(hidden_dims[i + 1]),
-                    nn.LeakyReLU())
-            )
+      modules.extend(
+          nn.Sequential(
+              nn.ConvTranspose2d(
+                  hidden_dims[i],
+                  hidden_dims[i + 1],
+                  kernel_size=3,
+                  stride=2,
+                  padding=1,
+                  output_padding=1,
+              ),
+              nn.BatchNorm2d(hidden_dims[i + 1]),
+              nn.LeakyReLU(),
+          ) for i in range(len(hidden_dims) - 1))
+      self.decoder = nn.Sequential(*modules)
 
-        self.decoder = nn.Sequential(*modules)
-
-        self.final_layer = nn.Sequential(
-                            nn.ConvTranspose2d(hidden_dims[-1],
-                                               hidden_dims[-1],
-                                               kernel_size=3,
-                                               stride=2,
-                                               padding=1,
-                                               output_padding=1),
-                            nn.BatchNorm2d(hidden_dims[-1]),
-                            nn.LeakyReLU(),
-                            nn.Conv2d(hidden_dims[-1], out_channels= 3,
-                                      kernel_size= 3, padding= 1),
-                            nn.Sigmoid())
+      self.final_layer = nn.Sequential(
+                          nn.ConvTranspose2d(hidden_dims[-1],
+                                             hidden_dims[-1],
+                                             kernel_size=3,
+                                             stride=2,
+                                             padding=1,
+                                             output_padding=1),
+                          nn.BatchNorm2d(hidden_dims[-1]),
+                          nn.LeakyReLU(),
+                          nn.Conv2d(hidden_dims[-1], out_channels= 3,
+                                    kernel_size= 3, padding= 1),
+                          nn.Sigmoid())
 
     @staticmethod
     def pretrained_weights_available():
         return list(AE.pretrained_urls.keys())
 
     def from_pretrained(self, checkpoint_name):
-        if checkpoint_name not in AE.pretrained_urls:
-            raise KeyError(str(checkpoint_name) + ' not present in pretrained weights.')
+      if checkpoint_name not in AE.pretrained_urls:
+        raise KeyError(f'{str(checkpoint_name)} not present in pretrained weights.')
 
-        return self.load_from_checkpoint(AE.pretrained_urls[checkpoint_name], strict=False)
+      return self.load_from_checkpoint(AE.pretrained_urls[checkpoint_name], strict=False)
 
     def encode(self, x):
       x = self.encoder(x)
       x = torch.flatten(x, start_dim=1)
-      mu = self.fc_mu(x)
-      return mu
+      return self.fc_mu(x)
 
     def decode(self, z):
       result = self.decoder_input(z)

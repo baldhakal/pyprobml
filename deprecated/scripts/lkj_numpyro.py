@@ -11,8 +11,8 @@ np.set_printoptions(precision=3)
 import matplotlib.pyplot as plt
 
 import jax
-print("jax version {}".format(jax.__version__))
-print("jax backend {}".format(jax.lib.xla_bridge.get_backend().platform))
+print(f"jax version {jax.__version__}")
+print(f"jax backend {jax.lib.xla_bridge.get_backend().platform}")
 
 import jax.numpy as jnp
 from jax import random, vmap

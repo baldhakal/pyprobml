@@ -49,7 +49,7 @@ param, hidden, observabale = 'Theta', 'Y', 'X'
 
 dot.node('phi', '<&Phi;>', color="white", fontcolor=fontcolor)
 
-for i, subscript in enumerate(subscripts_0):
+for subscript in subscripts_0:
     create_node(dot, param, subscript, color='white', fontcolor=fontcolor, is_greek_letter=True)
     dot.edge('phi', f'{param}{subscript}', color=edge_color)
 

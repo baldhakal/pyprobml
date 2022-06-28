@@ -52,11 +52,14 @@ def model():
     mu = pyro.sample('mu', dist.Normal(loc=torch.tensor(200.), 
                                        scale=torch.tensor(15.)))
     sigma = pyro.sample('sigma', dist.HalfCauchy(scale=torch.tensor(10.)))
-    
+
     # likelihood
     with pyro.plate('plate', size=2):
-        pyro.sample(f'obs', dist.Normal(loc=mu, scale=sigma), 
-                    obs=torch.tensor([195., 185.]))
+        pyro.sample(
+            'obs',
+            dist.Normal(loc=mu, scale=sigma),
+            obs=torch.tensor([195.0, 185.0]),
+        )
     
 def guide():
     # variational parameters
@@ -76,14 +79,11 @@ svi = SVI(model, guide,
           optim=pyro.optim.ClippedAdam({"lr":0.01}), 
           loss=Trace_ELBO())
 
-# do gradient steps
-c = 0
-for step in range(1000):
-    c += 1
+for c, step in enumerate(range(1000), start=1):
     loss = svi.step()
     if step % 100 == 0:
         print("[iteration {:>4}] loss: {:.4f}".format(c, loss))
-        
+
 
 sigma = dist.Chi2(pyro.param('var_sig')).sample((10000,)).numpy()
 mu = dist.Normal(pyro.param('var_mu'), pyro.param('var_mu_sig')).sample((10000,)).numpy()

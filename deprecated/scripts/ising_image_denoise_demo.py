@@ -61,16 +61,13 @@ def gibbs(rng, img, J, niter=10, nburin=0):
 
   X = np.zeros(img.shape)
 
-  for iter in tqdm(range(niter)):
+  for _ in tqdm(range(niter)):
     for ix in range(img.shape[1]):
       for iy in range(img.shape[0]):
         e = energy(ix, iy, img2, J)
-      
-        if rng.random(1) < sigmoid(e - logOdds[iy, ix]):
-          img2[ iy, ix] = 1
-        else:
-          img2[ iy, ix] = -1
-    X += img2 
+
+        img2[ iy, ix] = 1 if rng.random(1) < sigmoid(e - logOdds[iy, ix]) else -1
+    X += img2
   return (1/(niter-nburin))*X
 
 def meanfield(img, J, niter=10, rate=1):
@@ -82,11 +79,11 @@ def meanfield(img, J, niter=10, rate=1):
 
   p1 = sigmoid(logOdds)
   mu = 2*p1 - 1
-  
+
   if not niter:
     return img 
 
-  for iter in tqdm(range(niter)): 
+  for _ in tqdm(range(niter)):
     for ix in range(img.shape[1]):
       for iy in range(img.shape[0]):
         Sbar = energy(ix, iy, mu, J)

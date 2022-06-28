@@ -28,7 +28,7 @@ color_2 = 'k' # '#e41a1c'
 fig, ax1 = plt.subplots(1, 1, figsize=(9, 6))
 
 # plot sampled functions from the prior
-for i in range(3):
+for _ in range(3):
     mu = mu_fun(xs)
     sigma = kfn(xs, xs) + 1e-15 * np.eye(len(xs))
     fs = gaussSample(mu, sigma, 1)
@@ -54,7 +54,7 @@ S2 = np.diag(postCov)
 f = np.concatenate([mu + 2 * np.sqrt(S2), np.flip(mu - 2 * np.sqrt(S2), axis=0)])
 ax2.fill(np.concatenate([xs, np.flip(xs, axis=0)]), f, color=color_2, alpha=0.2)
 
-for i in range(3):
+for _ in range(3):
     mu = np.ravel(postMu)
     sigma = postCov
     fs = gaussSample(mu, sigma, 1)
@@ -84,14 +84,14 @@ for n in range(len(XtrainAll)):
     fig, ax = plt.subplots()
     ax.fill(np.concatenate([xs, np.flip(xs, axis=0)]), f, color=color_2, alpha=0.2)
 
-    for i in range(3):
+    for _ in range(3):
         mu = np.ravel(postMu)
         sigma = postCov
         fs = gaussSample(mu, sigma, 1)
         ax.plot(np.ravel(xs), np.ravel(fs), color=color_1, linestyle='-', linewidth=2)
         ax.scatter(Xtrain, ftrain, color=color_1, marker='x', linewidth=12)
 
-    ax.set_title('N={}'.format(n + 1))
+    ax.set_title(f'N={n + 1}')
     pml.savefig(f'gprDemoNoiseFreePost_N{n+1}.pdf')
 
 #pml.savefig('gprDemoNoiseFreePost_subplots.pdf')

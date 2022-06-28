@@ -16,10 +16,10 @@ ys = [1, 3]
 for yidx in ys:
   X = iris.data[:, xidx:xidx+1]  # we only take the first  feature
   Y = iris.data[:, yidx:yidx+1]
-  
+
   linreg = LinearRegression()
   linreg.fit(X, Y)
-  
+
   xs = np.arange(np.min(X), np.max(X), 0.1).reshape(-1,1)
   yhat = linreg.predict(xs)
   plt.plot(xs, yhat)
@@ -28,7 +28,7 @@ for yidx in ys:
   plt.ylabel(iris.feature_names[yidx])
   plt.xlim(np.min(X), np.max(X))
   plt.ylim(np.min(Y), np.max(Y))
-  
-  fname = "iris-linreg{}".format(yidx)
+
+  fname = f"iris-linreg{yidx}"
   pml.savefig(fname)
   plt.show()

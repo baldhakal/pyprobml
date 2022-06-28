@@ -38,7 +38,7 @@ alphas = np.logspace(-10, 1.3, 10)
 nalphas = len(alphas)
 mse_train = np.empty(nalphas)
 mse_test = np.empty(nalphas)
-ytest_pred_stored = dict()
+ytest_pred_stored = {}
 for i, alpha in enumerate(alphas):
     model = Ridge(alpha=alpha, fit_intercept=False)
     poly_features = PolynomialFeatures(degree=deg, include_bias=False)
@@ -50,7 +50,7 @@ for i, alpha in enumerate(alphas):
     mse_train[i] = mse(ytrain_pred, ytrain) 
     mse_test[i] = mse(ytest_pred, ytest)
     ytest_pred_stored[alpha] = ytest_pred
-    
+
 # Plot MSE vs degree
 fig, ax = plt.subplots()
 mask = [True]*nalphas
@@ -70,5 +70,5 @@ for i, alpha in enumerate(chosen_alphas):
     ax.scatter(xtrain, ytrain)
     ax.plot(xtest, ytest_pred_stored[alpha])
     plt.title('L2 regularizer {:0.5f}'.format(alpha))
-    save_fig('polyfitRidge{}.pdf'.format(i))
+    save_fig(f'polyfitRidge{i}.pdf')
     plt.show()

@@ -24,6 +24,7 @@ n = len(y)
 X_pad = np.column_stack((np.ones(n), X))
 
 
+n = 10
 for use_quad in (False, True):
   phi = X_pad
 
@@ -35,7 +36,6 @@ for use_quad in (False, True):
   ax.set_zlim(15, 19)
   ax.scatter(X[:,0], X[:,1], y, color='r')
 
-  n = 10
   xrange = np.linspace(min(X[:,0]), max(X[:,0]), n)
   yrange = np.linspace(min(X[:,1]), max(X[:,1]), n)
   xx, yy = np.meshgrid(xrange, yrange)

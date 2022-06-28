@@ -13,8 +13,8 @@ with open('imagenet_class_names.txt', 'w') as f:
     #writer = csv.writer(csvfile, delimiter=',')
     for i in range(len(m)):
         #writer.writerow(m[i])
-        f.write("{}: {}\n".format(i, m[i]))
-        
+        f.write(f"{i}: {m[i]}\n")
+                
 
 # view the label hierarchy
 #http://image-net.org/synset?wnid=n07739125

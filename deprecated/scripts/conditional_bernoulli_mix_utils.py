@@ -66,10 +66,10 @@ def fake_test_data(test_words, dataset, targets, L, type_, rng_key=None):
     if rng_key is None:
         rng_key = PRNGKey(0)
 
-    keys = [dev_arr for dev_arr in split(rng_key, len(test_words))]
+    keys = list(split(rng_key, len(test_words)))
     for word, key in zip(test_words, keys):
         classes = encode(word, L, type_)
-        keys_ = [dev_array for dev_array in split(key, len(word))]
+        keys_ = list(split(key, len(word)))
 
         get_img_index = lambda key, target: jax.random.choice(key, jnp.where(targets_with_blank == target)[0])
 
@@ -100,10 +100,7 @@ def get_emnist_images_per_class(select_n):
     dataset = dataset[np.argwhere(targets >= 0)]
     targets = targets[np.argwhere(targets >= 0)].flatten()
 
-    target_ls = []
-    for i in range(52):
-        target_ls.append(np.argwhere(targets == i)[:select_n])
-
+    target_ls = [np.argwhere(targets == i)[:select_n] for i in range(52)]
     targets = targets[np.concatenate(target_ls)].flatten()
     dataset = dataset[np.concatenate(target_ls)].squeeze()
 
